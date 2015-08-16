@@ -1,0 +1,17 @@
+To Do:
+
+	Design timing for Client GUI and Server Handler
+	Add option to end info round
+	Add voting protocol - for straw vote with results displayed
+	Have the real vote with only two candidates moving on
+	Make buying reusable for next info round
+	Have final round vote
+	Show winner
+	
+	Backlogged:
+		Use bimodal distribution
+		Show graph
+		Add descriptions
+		Allow server gui to have some control
+		Ensure security of info
+		Have info write out
