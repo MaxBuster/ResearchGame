@@ -23,10 +23,10 @@ public class ClientHandler {
 	}
 
 	public void handleIO() {
-		int playerNum;
-		int idealPt;
-		char party;
-		int budget;
+		int playerNum = 0;
+		int idealPt = 0;
+		char party = 'X';
+		int budget = 0;
 		while (true) {
 			try {
 				char c = (char) socketInputStream.readByte();

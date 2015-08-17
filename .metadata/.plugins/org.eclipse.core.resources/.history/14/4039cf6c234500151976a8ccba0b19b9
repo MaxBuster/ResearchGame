@@ -131,7 +131,7 @@ public class ClientJFrame extends JFrame {
 		initializeCandArrays(candNums, parties);
 //		addTable1Buy1();
 		String[] table1Names = {"Candidate #", "Party", "Info"};
-		Object[][] table1Data = { {1,'R',"-------"}, {2,"R","-------"}, {3,"R","-------"}, {4,"R","-------"} };
+		Object[][] table1Data = { {1,"R","-------"}, {2,"R","-------"}, {3,"R","-------"}, {4,"R","-------"} };
 		setScrollPane1(table1Names, table1Data);
 //		addTable2Buy(candNums, 1);
 

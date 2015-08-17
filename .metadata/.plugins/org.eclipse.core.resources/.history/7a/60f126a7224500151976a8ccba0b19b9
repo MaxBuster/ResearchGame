@@ -131,13 +131,12 @@ public class ClientJFrame extends JFrame {
 		initializeCandArrays(candNums, parties);
 //		addTable1Buy1();
 		String[] table1Names = {"Candidate #", "Party", "Info"};
-		Object[][] table1Data = { {1,'R',"-------"}, {2,"R","-------"}, {3,"R","-------"}, {4,"R","-------"} };
-		setScrollPane1(table1Names, table1Data);
+		Object[][] table1Data = { {1,"R","-------"}, {2,"R","-------"}, {3,"R","-------"}, {4,"R","-------"} };
+//		setScrollPane1(table1Names, table1Data);
 //		addTable2Buy(candNums, 1);
 
 		String[] table2Names = {"Candidate #", "Price", "Buy"};
 		Object[][] table2Data = { {1,"100","Buy"}, {2,"100","Buy"}, {3,"100","Buy"}, {4,"100","Buy"} };
-		setScrollPane2(table2Names, table2Data, "Buy");
 		contentPane.revalidate();
 		contentPane.repaint();
 	}
