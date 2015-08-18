@@ -97,25 +97,29 @@ public class ClientHandler {
 					int numCandidates = socketInputStream.readByte();
 					int round = socketInputStream.readByte();
 					// If its 0 then do straw if its 1 then start buy after
+					int[][] strawVotes = new int[numCandidates][2];
+					int[] numVotes = new int[numCandidates];
 					for (int i = 0; i < numCandidates; i++) {
 						int candNum = socketInputStream.readByte();
 						int numStrawVotes = socketInputStream.readByte();
-						addToTable1Data(candNum-1, round+3, numStrawVotes); // FIXME add to the cell based on the round + standardize cand locations
+						numVotes[i] = numStrawVotes;
+						System.out.println("Candidate: " + candNum + " Got: "
+								+ numStrawVotes + " votes");
+						strawVotes[i][0] = candNum;
+						strawVotes[i][1] = numStrawVotes;
 					}
 					if (round == 0) {
-						gui.removeScrollPane1();
-						gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
-						gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
-						gui.updateGUI();
+						gui.updateVotes(strawVotes, true);
 					} else if (round == 1) {
-						gui.removeScrollPane1();
-						gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
-						gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
-						gui.updateGUI();
+						gui.updateVotes(strawVotes, false);
+						int[] candNums = new int[numCandidates];
+						for (int i = 0; i < numCandidates; i++) {
+							candNums[i] = strawVotes[i][0];
+						}
+//						gui.addTable2Buy(candNums, 2);
 					}
 				} else if (messageType == 11) {
-					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
-					gui.updateGUI();
+					gui.addTable2Vote();
 				} else if (messageType == 13) {
 					int winningCandidate = socketInputStream.readByte() + 1;
 					gui.setTextPane("The winner is: " + winningCandidate);

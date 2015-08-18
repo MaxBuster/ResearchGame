@@ -100,7 +100,7 @@ public class ClientHandler {
 					for (int i = 0; i < numCandidates; i++) {
 						int candNum = socketInputStream.readByte();
 						int numStrawVotes = socketInputStream.readByte();
-						addToTable1Data(candNum-1, round+3, numStrawVotes); // FIXME add to the cell based on the round + standardize cand locations
+						addToTable1Data(candNum-1, round+3, numStrawVotes); // FIXME add to the cell based on the round
 					}
 					if (round == 0) {
 						gui.removeScrollPane1();
@@ -114,8 +114,7 @@ public class ClientHandler {
 						gui.updateGUI();
 					}
 				} else if (messageType == 11) {
-					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
-					gui.updateGUI();
+//					gui.addTable2Vote();
 				} else if (messageType == 13) {
 					int winningCandidate = socketInputStream.readByte() + 1;
 					gui.setTextPane("The winner is: " + winningCandidate);

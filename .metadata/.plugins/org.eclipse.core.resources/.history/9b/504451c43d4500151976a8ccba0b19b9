@@ -67,7 +67,10 @@ public class ServerHandler {
 					int candidateToBuyFrom = in.readInt();
 					Candidate candidate = model
 							.getCandidate(candidateToBuyFrom);
-					int lowerBound = candidate.getLowerBound(); // FIXME generate these from the normal dist.
+					int lowerBound = candidate.getLowerBound(); // FIXME
+																// generate
+																// these from a
+																// normal dist
 					int upperBound = candidate.getUpperBound();
 
 					writeMessage(6, candidateToBuyFrom);
@@ -75,9 +78,12 @@ public class ServerHandler {
 					out.writeInt(upperBound);
 				} else if (messageType == 7) { // Ended a buy round
 					int whichBuyRound = in.readByte();
-					waitForNewRound(); // Waits for all players to be done with the round
-					setRound(whichBuyRound); // Sets the round in the player's data
-					startRound(whichBuyRound); // Sends out a starting round message
+					waitForNewRound(); // Waits for all players to be done with
+										// the round
+					setRound(whichBuyRound); // Sets the round in the player's
+												// data
+					startRound(whichBuyRound); // Sends out a starting round
+												// message
 				} else if (messageType == 9) {
 					int candidateToVoteFor = in.readByte();
 					if (player.getRound() == "first") {
@@ -108,17 +114,26 @@ public class ServerHandler {
 								}
 							}
 						}
-						writeMessage(10, 2); // 2 means that you write out the top two cands
+						writeMessage(10, 2); // 2 means that you write out the
+												// top two cands
 						out.writeByte(1);
-						for (int i = 3; i > 1; i--) { // This writes the top two cands
+						for (int i = 3; i > 1; i--) { // This writes the top two
+														// cands
 							out.writeByte(candidates[i].getCandidateNumber());
 							out.writeByte(candidates[i].getFirstVotes());
 						}
 					} else {
-						if (candidates[3].getSecondVotes() > candidates[2].getSecondVotes()) {
-							writeMessage(13, candidates[3].getCandidateNumber()); // Writes out the winner
+						if (candidates[3].getSecondVotes() > candidates[2]
+								.getSecondVotes()) {
+							writeMessage(13, candidates[3].getCandidateNumber()); // Writes
+																					// out
+																					// the
+																					// winner
 						} else {
-							writeMessage(13, candidates[2].getCandidateNumber()); // Writes out the winner
+							writeMessage(13, candidates[2].getCandidateNumber()); // Writes
+																					// out
+																					// the
+																					// winner
 						}
 					}
 				} else {

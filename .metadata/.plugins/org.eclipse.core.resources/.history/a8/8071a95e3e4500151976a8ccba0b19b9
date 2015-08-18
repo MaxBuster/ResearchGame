@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -38,13 +39,24 @@ public class ClientJFrame extends JFrame {
 	private char party = 'X';
 	private int budget = 2000;
 	private JLabel lblBudget;
+	private Object[][] data;
 	private JTextPane genericTextPane;
 
 	private JScrollPane scrollPane1;
 	private JTable table1;
+	private Object[][] table1Data;
+	private String[] table1Names;
 
 	private JScrollPane scrollPane2;
 	private JTable table2;
+	private Object[][] table2Data;
+	private String[] table2Names;
+
+	private int[] candNums;
+	private char[] candParties;
+	private String[] candInfo;
+	private int[] candVotes;
+	private int[] candVotes1;
 
 	/**
 	 * Create the frame.
@@ -68,6 +80,23 @@ public class ClientJFrame extends JFrame {
 		table1 = new JTable();
 		table2 = new JTable();
 	}
+	
+	/**
+	 * Have:
+	 * arrays with data for each candidate
+	 * addLabels
+	 * addChart
+	 * setText
+	 * addEndRound
+	 * addInfo
+	 * addTable2ForVote
+	 * addTable2ForBuy
+	 * addTable1ForBuy1
+	 * addTable1ForBuy2
+	 * addTable1ForStraw
+	 * addTable1ForVote1
+	 * addTable1ForVote2
+	 */
 
 	public void addLabels(int playerNum, char party, int idealPt, int budget) {
 		JLabel lblPlayerNumber = new JLabel("Player Number: " + playerNum);
@@ -144,6 +173,66 @@ public class ClientJFrame extends JFrame {
 	public void removeScrollPane2() {
 		contentPane.remove(scrollPane2);
 	}
+
+//	public void updateVotes(int[][] votes, boolean isVoteRound) {
+//		for (int i = 0; i < votes.length; i++) {
+//			if (!isVoteRound) {
+//				candVotes1[votes[i][0] - 1] = votes[i][1];
+//			} else {
+//				candVotes[votes[i][0] - 1] = votes[i][1];
+//			}
+//		}
+//		if (!isVoteRound) {
+//			table1Names = new String[] { "Cand Num", "Party", "Info",
+//					"Straw Votes", "First Round Votes" };
+//			table1Data = new Object[votes.length][5];
+//		} else {
+//			table1Names = new String[] { "Cand Num", "Party", "Info",
+//					"Straw Votes" };
+//			table1Data = new Object[votes.length][4];
+//		}
+//		table2Names = new String[] { "CandNum", "Party", "Vote" };
+//		table2Data = new Object[votes.length][3];
+//		for (int i = 0; i < votes.length; i++) {
+//			int arrayIndex = votes[i][0] - 1;
+//			table1Data[i][0] = candNums[arrayIndex];
+//			table1Data[i][1] = candParties[arrayIndex];
+//			table1Data[i][2] = candInfo[arrayIndex];
+//			if (!isVoteRound) {
+//				table1Data[i][3] = candVotes[arrayIndex];
+//				table1Data[i][4] = candVotes1[arrayIndex];
+//			} else {
+//				table1Data[i][3] = candVotes[arrayIndex];
+//			}
+//
+//			table2Data[i][0] = candNums[arrayIndex];
+//			table2Data[i][1] = candParties[arrayIndex];
+//			table2Data[i][2] = "Vote";
+//		}
+//
+//		DefaultTableModel table1Model = new DefaultTableModel(table1Data,
+//				table1Names);
+//		table1 = new JTable(table1Model);
+//		Dimension d = new Dimension(5, 5);
+//		table1.setPreferredScrollableViewportSize(d);
+//		scrollPane1 = new JScrollPane(table1);
+//		contentPane.add(scrollPane1, "cell 1 3 4 1,grow");
+//
+//		DefaultTableModel table2Model = new DefaultTableModel(table2Data,
+//				table2Names);
+//		table2 = new JTable(table2Model);
+//		table2.getColumn("Vote").setCellRenderer(new ButtonRenderer());
+//		table2.getColumn("Vote").setCellEditor(
+//				new ButtonEditor(new JCheckBox()));
+//		table2.setPreferredScrollableViewportSize(d);
+//		scrollPane2 = new JScrollPane(table2);
+//		if (isVoteRound) {
+//			contentPane.add(scrollPane2, "cell 1 4 4 1,grow");
+//		}
+//
+//		contentPane.revalidate();
+//		contentPane.repaint();
+//	}
 
 	class ButtonRenderer extends JButton implements TableCellRenderer {
 

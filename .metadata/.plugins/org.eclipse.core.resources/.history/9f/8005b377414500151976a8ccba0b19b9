@@ -114,8 +114,7 @@ public class ClientHandler {
 						gui.updateGUI();
 					}
 				} else if (messageType == 11) {
-					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
-					gui.updateGUI();
+//					gui.addTable2Vote();
 				} else if (messageType == 13) {
 					int winningCandidate = socketInputStream.readByte() + 1;
 					gui.setTextPane("The winner is: " + winningCandidate);
