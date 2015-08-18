@@ -1,0 +1,163 @@
+package client;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
+public class ClientHandler {
+	private final PropertyChangeSupport PCS = new PropertyChangeSupport(this);
+	private DataInputStream socketInputStream;
+	private DataOutputStream socketOutputStream;
+	private ClientJFrame gui;
+	
+	private final String[] TABLE2BUYNAMES = {"Candidate #", "Price", "Buy"};
+	private final String[] TABLE2VOTENAMES = {"Candidate #", "Vote"};
+	private final String[] TABLE1NAMES = {"Candidate #", "Party", "Ideal Point", "Straw Votes", "First Round Votes"};
+	
+	private Object[][] TABLE2BUYDATA;
+	private Object[][] TABLE2VOTEDATA;
+	private Object[][] TABLE1DATA;
+	
+	public ClientHandler(DataInputStream socketInputStream,
+			DataOutputStream socketOutputStream) {
+		PCS.addPropertyChangeListener(new ChangeListener());
+		this.socketInputStream = socketInputStream;
+		this.socketOutputStream = socketOutputStream;
+		gui = new ClientJFrame(PCS);
+		gui.setVisible(true);
+	}
+
+	public void handleIO() {
+		int playerNum;
+		int idealPt;
+		char party;
+		int budget;
+		while (true) {
+			try {
+				char c = (char) socketInputStream.readByte();
+				while (c != '!') {
+					c = (char) socketInputStream.readByte();
+				}
+				int messageType = socketInputStream.readByte();
+				if (messageType == 0) { // Getting labels
+					playerNum = socketInputStream.readByte();
+					party = socketInputStream.readChar();
+					idealPt = socketInputStream.readInt();
+					budget = socketInputStream.readInt();
+					gui.addLabels(playerNum, party, idealPt, budget);
+				} else if (messageType == 1) { // Getting graph data
+					int numPoints = socketInputStream.readInt();
+					int[] chartData = new int[numPoints];
+					for (int i = 0; i < numPoints; i++) {
+						chartData[i] = socketInputStream.readInt();
+					}
+					gui.addChart(chartData);
+				} else if (messageType == 2) { // Getting candidates and starting the game
+					int numCandidates = socketInputStream.readByte();
+					TABLE2BUYDATA = new Object[numCandidates][3];
+					TABLE2VOTEDATA = new Object[numCandidates][2];
+					TABLE1DATA = new Object[numCandidates][5];
+					
+					for (int i = 0; i < numCandidates; i++) {
+						int candidateNumber = socketInputStream.readByte();
+						char candidateParty = (char) socketInputStream.readByte();
+						TABLE2BUYDATA[i] = new Object[] {candidateNumber, 1000, "Buy"}; // FIXME change price dynamically
+						TABLE2VOTEDATA[i] = new Object[] {candidateNumber, "Vote"};
+						TABLE1DATA[i] = new Object[] {candidateNumber, candidateParty, "-------", "-------", "-------"};
+					}
+					gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
+					gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
+				} else if (messageType == 6) { // Got info
+					int candidate = socketInputStream.readByte();
+					int lowerBound = socketInputStream.readInt();
+					int upperBound = socketInputStream.readInt();
+					gui.addInfo(candidate, lowerBound, upperBound);
+				} else if (messageType == 8) { // Starting the straw vote
+					gui.addTable2Vote();
+					gui.startStrawVote();
+				} else if (messageType == 10) {
+					int numCandidates = socketInputStream.readByte();
+					int round = socketInputStream.readByte();
+					// If its 0 then do straw if its 1 then start buy after
+					int[][] strawVotes = new int[numCandidates][2];
+					int[] numVotes = new int[numCandidates];
+					for (int i = 0; i < numCandidates; i++) {
+						int candNum = socketInputStream.readByte();
+						int numStrawVotes = socketInputStream.readByte();
+						numVotes[i] = numStrawVotes;
+						System.out.println("Candidate: " + candNum + " Got: "
+								+ numStrawVotes + " votes");
+						strawVotes[i][0] = candNum;
+						strawVotes[i][1] = numStrawVotes;
+					}
+					if (round == 0) {
+						gui.updateVotes(strawVotes, true);
+					} else if (round == 1) {
+						gui.updateVotes(strawVotes, false);
+						int[] candNums = new int[numCandidates];
+						for (int i = 0; i < numCandidates; i++) {
+							candNums[i] = strawVotes[i][0];
+						}
+						gui.addTable2Buy(candNums, 2);
+					}
+				} else if (messageType == 11) {
+					gui.addTable2Vote();
+				} else if (messageType == 13) {
+					int winningCandidate = socketInputStream.readByte() + 1;
+					gui.setTextPane("The winner is: " + winningCandidate);
+				} else {
+					// Read the rest and ignore
+				}
+			} catch (IOException e) {
+				break; // End client
+			}
+		}
+	}
+
+	class ChangeListener implements PropertyChangeListener {
+		@Override
+		public void propertyChange(PropertyChangeEvent PCE) {
+			if (PCE.getPropertyName() == "Buy Info") {
+				int candidateToBuyFrom = (Integer) PCE.getOldValue();
+				buyInfo(candidateToBuyFrom);
+			} else if (PCE.getPropertyName() == "Vote") {
+				int candidateToVoteFor = (Integer) PCE.getOldValue();
+				voteForCandidate(candidateToVoteFor);
+			} else if (PCE.getPropertyName() == "End Round") {
+				try {
+					int whichRound = (Integer) PCE.getOldValue();
+					socketOutputStream.writeChar((int) '!');
+					socketOutputStream.writeByte(7); // End buy round
+					socketOutputStream.writeByte(whichRound); // Which buy round
+																// is ending
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public void buyInfo(int candNum) {
+		try {
+			socketOutputStream.writeChar((int) '!');
+			socketOutputStream.writeByte(5);
+			socketOutputStream.writeInt(candNum);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void voteForCandidate(int candNum) {
+		try {
+			socketOutputStream.writeChar((int) '!');
+			socketOutputStream.writeByte(9);
+			socketOutputStream.writeByte(candNum);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+}

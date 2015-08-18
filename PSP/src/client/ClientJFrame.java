@@ -126,18 +126,8 @@ public class ClientJFrame extends JFrame {
 		ChartPanel pane = new ChartPanel(graph);
 		contentPane.add(pane, "cell 1 5 4 1,grow");
 	}
-
-	public void startFirstBuyRound(int[] candNums, char[] parties) {
-		initializeCandArrays(candNums, parties);
-//		addTable1Buy1();
-		String[] table1Names = {"Candidate #", "Party", "Info"};
-		Object[][] table1Data = { {1,'R',"-------"}, {2,"R","-------"}, {3,"R","-------"}, {4,"R","-------"} };
-		setScrollPane1(table1Names, table1Data);
-//		addTable2Buy(candNums, 1);
-
-		String[] table2Names = {"Candidate #", "Price", "Buy"};
-		Object[][] table2Data = { {1,"100","Buy"}, {2,"100","Buy"}, {3,"100","Buy"}, {4,"100","Buy"} };
-		setScrollPane2(table2Names, table2Data, "Buy");
+	
+	public void updateGUI() {
 		contentPane.revalidate();
 		contentPane.repaint();
 	}
@@ -164,128 +154,24 @@ public class ClientJFrame extends JFrame {
 		contentPane.add(scrollPane2, "cell 1 4 4 1,grow");
 	}
 
-	public void initializeCandArrays(int[] candNums, char[] parties) {
-		this.candNums = new int[candNums.length];
-		this.candParties = new char[candNums.length];
-		this.candInfo = new String[candNums.length];
-		this.candVotes = new int[candNums.length]; // FIXME are these necessary?
-		this.candVotes1 = new int[candNums.length];
-
-		for (int i = 0; i < candNums.length; i++) {
-			this.candNums[i] = candNums[i];
-			this.candParties[i] = parties[i];
-			this.candInfo[i] = "-----";
-			this.candVotes[i] = 0; // FIXME are these necessary?
-		}
-	}
-
-	public void addTable1Buy1() {
-		table1Names = new String[] { "Cand Num", "Party", "Info" };
-		table1Data = new Object[candNums.length][3];
-		for (int i = 0; i < candNums.length; i++) {
-			table1Data[i][0] = candNums[i];
-			table1Data[i][1] = candParties[i];
-			table1Data[i][2] = "-----";
-		}
-
-		DefaultTableModel table1Model = new DefaultTableModel(table1Data,
-				table1Names);
-		table1 = new JTable(table1Model);
-		Dimension d = new Dimension(5, 5);
-		table1.setPreferredScrollableViewportSize(d);
-		scrollPane1 = new JScrollPane(table1);
-		contentPane.add(scrollPane1, "cell 1 3 4 1,grow");
-	}
-
-	public void addTable1() {
-		DefaultTableModel table1Model = new DefaultTableModel(table1Data,
-				table1Names);
-		table1 = new JTable(table1Model);
-		Dimension d = new Dimension(5, 5);
-		table1.setPreferredScrollableViewportSize(d);
-		scrollPane1 = new JScrollPane(table1);
-		contentPane.add(scrollPane1, "cell 1 3 4 1,grow");
-	}
-
-	public void addTable2(String btnType) {
-		DefaultTableModel table2Model = new DefaultTableModel(table2Data,
-				table2Names);
-		table2 = new JTable(table2Model);
-		Dimension d = new Dimension(5, 5);
-		table2.setPreferredScrollableViewportSize(d);
-		// FIXME Set column to button by btnType
-		scrollPane2 = new JScrollPane(table2);
-		contentPane.add(scrollPane2, "cell 1 4 4 1,grow");
-	}
-
 	public void addEndRoundBtn(final int roundNum) {
 		final JButton btnEndRound = new JButton("End Round");
 		btnEndRound.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				btnEndRound.setVisible(false);
-				if (roundNum == 1) {
-					contentPane.remove(scrollPane1);
-				}
 				contentPane.remove(scrollPane2);
-				PCS.firePropertyChange("End Round", roundNum, null); // Sends
-																		// which
-																		// buy
-																		// round
-																		// ended
+				PCS.firePropertyChange("End Round", roundNum, null); // Sends which buy round ended
 			}
 		});
 		contentPane.add(btnEndRound, "cell 4 6");
 	}
-
-	public void addTable2Buy(int[] candNums, int roundNum) {
-		addEndRoundBtn(roundNum);
-		setTable2BuyData(candNums);
-		String[] table2Names = { "CandNum", "Party", "Price", "Buy" };
-		setScrollPane2Buy(table2Names);
-		contentPane.add(scrollPane2, "cell 1 4 4 1,grow");
-		contentPane.revalidate();
-		contentPane.repaint();
+	
+	public void removeScrollPane1() {
+		contentPane.remove(scrollPane1);
 	}
-
-	public void setTable2BuyData(int[] candNums) {
-		table2Data = new Object[candNums.length][4];
-		for (int i = 0; i < candNums.length; i++) {
-			int candNum = candNums[i];
-			table2Data[i][0] = candNum;
-			table2Data[i][1] = this.candParties[candNum - 1];
-			if (party == this.candParties[candNum - 1]) {
-				table2Data[i][2] = "1000";
-			} else {
-				table2Data[i][2] = "500";
-			}
-			table2Data[i][3] = "Buy";
-		}
-	}
-
-	public void setScrollPane2Buy(String[] table2Names) {
-		DefaultTableModel table2Model = new DefaultTableModel(table2Data,
-				table2Names);
-		table2 = new JTable(table2Model);
-		table2.getColumn("Buy").setCellRenderer(new ButtonRenderer());
-		table2.getColumn("Buy")
-				.setCellEditor(new ButtonEditor(new JCheckBox()));
-		Dimension d = new Dimension(5, 5);
-		table2.setPreferredScrollableViewportSize(d);
-		scrollPane2 = new JScrollPane(table2);
-	}
-
-	public void addInfo(int candidate, int lowerBound, int upperBound) {
-		String info = lowerBound + " - " + upperBound;
-		candInfo[candidate] = info;
-		// FIXME Find a better way to do this?
-		for (int i = 0; i < table1.getRowCount(); i++) {
-			int number = (Integer) table1.getModel().getValueAt(i, 0) - 1;
-			if (number == candidate) {
-				table1.getModel().setValueAt(info, i, 2);
-				contentPane.revalidate();
-				contentPane.repaint();
-			}
-		}
+	
+	public void removeScrollPane2() {
+		contentPane.remove(scrollPane2);
 	}
 
 	public void addTable2Vote() {
@@ -441,8 +327,7 @@ public class ClientJFrame extends JFrame {
 
 		public void fireBuy() {
 			int selectedRow = table2.getSelectedRow();
-			char selectedParty = (Character) table2.getModel().getValueAt(
-					selectedRow, 1);
+			char selectedParty = (Character) table1.getModel().getValueAt(selectedRow, 1);
 			if (party == selectedParty) {
 				if (budget >= 2 * 500) {
 					int selectedCand = (Integer) table2.getModel().getValueAt(

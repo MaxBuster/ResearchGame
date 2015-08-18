@@ -12,7 +12,20 @@ public class ClientHandler {
 	private DataInputStream socketInputStream;
 	private DataOutputStream socketOutputStream;
 	private ClientJFrame gui;
+	
+	private final String[] TABLE2BUYNAMES = {"Candidate #", "Price", "Buy"};
+	private final String[] TABLE2VOTENAMES = {"Candidate #", "Vote"};
+	private final String[] TABLE1NAMES = {"Candidate #", "Party", "Ideal Point", "Straw Votes", "First Round Votes"};
+	
+	private Object[][] TABLE2BUYDATA;
+	private Object[][] TABLE2VOTEDATA;
+	private Object[][] TABLE1DATA;
 
+	private int playerNum;
+	private int idealPt;
+	private char party;
+	private int budget;
+	
 	public ClientHandler(DataInputStream socketInputStream,
 			DataOutputStream socketOutputStream) {
 		PCS.addPropertyChangeListener(new ChangeListener());
@@ -23,10 +36,6 @@ public class ClientHandler {
 	}
 
 	public void handleIO() {
-		int playerNum;
-		int idealPt;
-		char party;
-		int budget;
 		while (true) {
 			try {
 				char c = (char) socketInputStream.readByte();
@@ -47,25 +56,43 @@ public class ClientHandler {
 						chartData[i] = socketInputStream.readInt();
 					}
 					gui.addChart(chartData);
-				} else if (messageType == 2) { // Getting candidates and
-												// starting the game
+				} else if (messageType == 2) { // Getting candidates and starting the game
 					int numCandidates = socketInputStream.readByte();
-					int[] candidateNums = new int[numCandidates];
-					char[] candidateParties = new char[numCandidates];
+					TABLE2BUYDATA = new Object[numCandidates][3];
+					TABLE2VOTEDATA = new Object[numCandidates][2];
+					TABLE1DATA = new Object[numCandidates][5];
+					
 					for (int i = 0; i < numCandidates; i++) {
-						candidateNums[i] = socketInputStream.readByte();
-						candidateParties[i] = (char) socketInputStream
-								.readByte();
+						int candidateNumber = socketInputStream.readByte();
+						char candidateParty = (char) socketInputStream.readByte();
+						int infoPrice;
+						if (candidateParty == party) { // FIXME change price based on budget too
+							infoPrice = 1000;
+						}
+						else {
+							infoPrice = 500;
+						}
+						TABLE2BUYDATA[i] = new Object[] {candidateNumber, infoPrice, "Buy"}; 
+						TABLE2VOTEDATA[i] = new Object[] {candidateNumber, "Vote"};
+						TABLE1DATA[i] = new Object[] {candidateNumber, candidateParty, "-------", "-------", "-------"};
 					}
-					gui.startFirstBuyRound(candidateNums, candidateParties);
+					gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
+					gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
+					gui.addEndRoundBtn(1);
+					gui.updateGUI();
 				} else if (messageType == 6) { // Got info
 					int candidate = socketInputStream.readByte();
 					int lowerBound = socketInputStream.readInt();
 					int upperBound = socketInputStream.readInt();
-					gui.addInfo(candidate, lowerBound, upperBound);
+					String info = lowerBound + " - " + upperBound;
+					addToTable1Data(candidate, 2, info);
+					gui.removeScrollPane1();
+					gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
+					gui.updateGUI();
 				} else if (messageType == 8) { // Starting the straw vote
-					gui.addTable2Vote();
-					gui.startStrawVote();
+					gui.removeScrollPane2();
+					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
+					gui.updateGUI();
 				} else if (messageType == 10) {
 					int numCandidates = socketInputStream.readByte();
 					int round = socketInputStream.readByte();
@@ -89,7 +116,7 @@ public class ClientHandler {
 						for (int i = 0; i < numCandidates; i++) {
 							candNums[i] = strawVotes[i][0];
 						}
-						gui.addTable2Buy(candNums, 2);
+//						gui.addTable2Buy(candNums, 2);
 					}
 				} else if (messageType == 11) {
 					gui.addTable2Vote();
@@ -101,6 +128,14 @@ public class ClientHandler {
 				}
 			} catch (IOException e) {
 				break; // End client
+			}
+		}
+	}
+	
+	private void addToTable1Data(int candidateNumber, int position, Object data) {
+		for (int i=0; i<TABLE1DATA.length; i++) {
+			if (TABLE1DATA[i][0].equals(candidateNumber+1)) {
+				TABLE1DATA[i][position] = data;
 			}
 		}
 	}
