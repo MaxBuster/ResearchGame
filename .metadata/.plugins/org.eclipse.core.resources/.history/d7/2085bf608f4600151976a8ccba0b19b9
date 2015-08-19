@@ -47,6 +47,7 @@ public class MakeChart extends ApplicationFrame {
 		final JFreeChart chart = ChartFactory.createXYLineChart(
 				"Voter Distribution", "Ideal Point", "Number of Voters", dataset,
 				PlotOrientation.VERTICAL, false, false, false);
+		XYPlot plot = (XYPlot) chart.getPlot();
 		return chart;
 	}
 }

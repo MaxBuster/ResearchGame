@@ -47,6 +47,14 @@ public class MakeChart extends ApplicationFrame {
 		final JFreeChart chart = ChartFactory.createXYLineChart(
 				"Voter Distribution", "Ideal Point", "Number of Voters", dataset,
 				PlotOrientation.VERTICAL, false, false, false);
+		XYPlot plot = (XYPlot) chart.getPlot();
+		final IntervalMarker target = new IntervalMarker(400.0, 700.0);
+		target.setLabel("Target Range");
+		target.setLabelFont(new Font("SansSerif", Font.ITALIC, 11));
+		target.setLabelAnchor(RectangleAnchor.LEFT);
+		target.setLabelTextAnchor(TextAnchor.CENTER_LEFT);
+		target.setPaint(new Color(222, 222, 255, 128));
+		plot.addRangeMarker(target, Layer.BACKGROUND);
 		return chart;
 	}
 }
