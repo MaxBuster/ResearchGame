@@ -64,8 +64,9 @@ public class Model {
 	public int getIdealPt() {
 		double randomNum = Math.random();
 		double unroundedPt = randomNum * sumDataPoints;
+		
 		for (int i=0; i<100; i++) {
-			if (sumPoints[i] > unroundedPt) {
+			if (points[i] > unroundedPt) {
 				return i;
 			}
 		}

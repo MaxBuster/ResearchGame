@@ -32,12 +32,4 @@ public class BiModalDist {
 	public int[] getData() {
 		return data;
 	}
-	
-	public int[] getSumData() {
-		return sumData;
-	}
-	
-	public int getSum() {
-		return sum;
-	}
 }

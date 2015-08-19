@@ -4,8 +4,6 @@ import org.apache.commons.math3.distribution.NormalDistribution;
 
 public class BiModalDist {
 	private int[] data = new int[100];
-	private int[] sumData = new int[100];
-	private int sum = 0;
 
 	public BiModalDist(int split, int percent1, int percent2) {
 		// Have an array with the running totals
@@ -22,8 +20,6 @@ public class BiModalDist {
 					* normal1.cumulativeProbability(i) + percent2
 					* normal2.cumulativeProbability(i)));
 			int num = (nextInt - previousInt);
-			sum += num;
-			sumData[i] = sum;
 			data[i] = num;
 			previousInt = nextInt;
 		}
@@ -31,13 +27,5 @@ public class BiModalDist {
 
 	public int[] getData() {
 		return data;
-	}
-	
-	public int[] getSumData() {
-		return sumData;
-	}
-	
-	public int getSum() {
-		return sum;
 	}
 }

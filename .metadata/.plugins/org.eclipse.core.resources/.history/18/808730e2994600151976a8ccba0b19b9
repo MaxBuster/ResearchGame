@@ -8,8 +8,6 @@ public class Model {
 	private static final int BUDGET = 2000;
 	private Candidate[] candidates;
 	private int[] points;
-	private int[] sumPoints;
-	private int sumDataPoints;
 	private ArrayList<Player> players;
 	private String round;
 
@@ -21,8 +19,6 @@ public class Model {
 		players = new ArrayList<Player>();
 		BiModalDist distribution = new BiModalDist(40, 40, 60);
 		points = distribution.getData();
-		sumPoints = distribution.getSumData();
-		sumDataPoints = distribution.getSum();
 		round = "Buy";
 	}
 
@@ -63,13 +59,9 @@ public class Model {
 
 	public int getIdealPt() {
 		double randomNum = Math.random();
-		double unroundedPt = randomNum * sumDataPoints;
-		for (int i=0; i<100; i++) {
-			if (sumPoints[i] > unroundedPt) {
-				return i;
-			}
-		}
-		return 100;
+		double unroundedPt = randomNum * 100;
+		int idealPt = (int) unroundedPt;
+		return idealPt;
 	}
 
 	public char getParty() {
