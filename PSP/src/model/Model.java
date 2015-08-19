@@ -20,7 +20,6 @@ public class Model {
 		BiModalDist distribution = new BiModalDist(40, 40, 60);
 		points = distribution.getData();
 		round = "Buy";
-		// int totalPoints = distribution.getTotalPoints(); Use this?
 	}
 
 	public int[] getData() {

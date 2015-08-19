@@ -26,8 +26,7 @@ public class ClientHandler {
 	private char party;
 	private int budget;
 	
-	public ClientHandler(DataInputStream socketInputStream,
-			DataOutputStream socketOutputStream) {
+	public ClientHandler(DataInputStream socketInputStream, DataOutputStream socketOutputStream) {
 		PCS.addPropertyChangeListener(new ChangeListener());
 		this.socketInputStream = socketInputStream;
 		this.socketOutputStream = socketOutputStream;
@@ -44,80 +43,28 @@ public class ClientHandler {
 				}
 				int messageType = socketInputStream.readByte();
 				if (messageType == 0) { // Getting labels
-					playerNum = socketInputStream.readByte();
-					party = socketInputStream.readChar();
-					idealPt = socketInputStream.readInt();
-					budget = socketInputStream.readInt();
-					gui.addLabels(playerNum, party, idealPt, budget);
+					getAndSetLabels();
 				} else if (messageType == 1) { // Getting graph data
-					int numPoints = socketInputStream.readInt();
-					int[] chartData = new int[numPoints];
-					for (int i = 0; i < numPoints; i++) {
-						chartData[i] = socketInputStream.readInt();
-					}
-					gui.addChart(chartData);
+					getAndSetChart();
 				} else if (messageType == 2) { // Getting candidates and starting the game
-					int numCandidates = socketInputStream.readByte();
-					TABLE2BUYDATA = new Object[numCandidates][3];
-					TABLE2VOTEDATA = new Object[numCandidates][2];
-					TABLE1DATA = new Object[numCandidates][5];
-					
-					for (int i = 0; i < numCandidates; i++) {
-						int candidateNumber = socketInputStream.readByte();
-						char candidateParty = (char) socketInputStream.readByte();
-						int infoPrice;
-						if (candidateParty == party) { // FIXME change price based on budget too
-							infoPrice = 1000;
-						}
-						else {
-							infoPrice = 500;
-						}
-						TABLE2BUYDATA[i] = new Object[] {candidateNumber, infoPrice, "Buy"}; 
-						TABLE2VOTEDATA[i] = new Object[] {candidateNumber, "Vote"};
-						TABLE1DATA[i] = new Object[] {candidateNumber, candidateParty, "-------", "-------", "-------"};
-					}
+					getAndSetCandidateInfo();
 					gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
 					gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
 					gui.addEndRoundBtn(1);
 					gui.updateGUI();
 				} else if (messageType == 6) { // Got info
-					int candidate = socketInputStream.readByte();
-					int lowerBound = socketInputStream.readInt();
-					int upperBound = socketInputStream.readInt();
-					String info = lowerBound + " - " + upperBound;
-					addToTable1Data(candidate, 2, info);
-					gui.removeScrollPane1();
-					gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
-					gui.updateGUI();
+					getAndSetPurchasedInfo();
 				} else if (messageType == 8) { // Starting the straw vote
 					gui.removeScrollPane2();
 					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
 					gui.updateGUI();
 				} else if (messageType == 10) {
-					int numCandidates = socketInputStream.readByte();
-					int round = socketInputStream.readByte();
-					// If its 0 then do straw if its 1 then start buy after
-					for (int i = 0; i < numCandidates; i++) {
-						int candNum = socketInputStream.readByte();
-						int numStrawVotes = socketInputStream.readByte();
-						addToTable1Data(candNum-1, round+3, numStrawVotes); // FIXME add to the cell based on the round + standardize cand locations
-					}
-					if (round == 0) {
-						gui.removeScrollPane1();
-						gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
-						gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
-						gui.updateGUI();
-					} else if (round == 1) {
-						gui.removeScrollPane1();
-						gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
-						gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
-						gui.updateGUI();
-					}
+					startRoundAfterVote();
 				} else if (messageType == 11) {
 					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
 					gui.updateGUI();
 				} else if (messageType == 13) {
-					int winningCandidate = socketInputStream.readByte() + 1;
+					int winningCandidate = socketInputStream.readByte() + 1; // FIXME This gets the wrong value
 					gui.setTextPane("The winner is: " + winningCandidate);
 				} else {
 					// Read the rest and ignore
@@ -128,11 +75,105 @@ public class ClientHandler {
 		}
 	}
 	
+	private void getAndSetLabels() {
+		try {
+			playerNum = socketInputStream.readByte();
+			party = socketInputStream.readChar();
+			idealPt = socketInputStream.readInt();
+			budget = socketInputStream.readInt();
+			gui.addLabels(playerNum, party, idealPt, budget);
+		} catch (IOException e) {
+			// Alert that it couldn't retrieve the player data
+		}
+	}
+	
+	private void getAndSetChart() {
+		try {
+			int numPoints = socketInputStream.readInt();
+			int[] chartData = new int[numPoints];
+			for (int i = 0; i < numPoints; i++) {
+				chartData[i] = socketInputStream.readInt();
+			}
+			gui.addChart(chartData);
+		} catch (IOException e) {
+			// Alert that it couldn't retrieve the player data
+		}
+	}
+	
+	private void getAndSetCandidateInfo() {
+		try {
+			int numCandidates = socketInputStream.readByte();
+			TABLE2BUYDATA = new Object[numCandidates][3];
+			TABLE2VOTEDATA = new Object[numCandidates][2];
+			TABLE1DATA = new Object[numCandidates][5];
+			
+			for (int i = 0; i < numCandidates; i++) {
+				int candidateNumber = socketInputStream.readByte();
+				char candidateParty = (char) socketInputStream.readByte();
+				int infoPrice;
+				if (candidateParty == party) { // FIXME change price based on budget too
+					infoPrice = 1000;
+				}
+				else {
+					infoPrice = 500;
+				}
+				TABLE2BUYDATA[i] = new Object[] {candidateNumber, infoPrice, "Buy"}; 
+				TABLE2VOTEDATA[i] = new Object[] {candidateNumber, "Vote"};
+				TABLE1DATA[i] = new Object[] {candidateNumber, candidateParty, "-------", "-------", "-------"};
+			}
+		} catch (IOException e) {
+			// Alert that it couldn't retrieve the player data
+		}
+	}
+	
+	private void getAndSetPurchasedInfo() {
+		try {
+			int candidate = socketInputStream.readByte();
+			int lowerBound = socketInputStream.readInt();
+			int upperBound = socketInputStream.readInt();
+			String info = lowerBound + " - " + upperBound;
+			addToTable1Data(candidate, 2, info);
+			gui.removeScrollPane1();
+			gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
+			gui.updateGUI();
+		} catch (IOException e) {
+			// Alert that it couldn't retrieve the player data
+		}
+	}
+	
 	private void addToTable1Data(int candidateNumber, int position, Object data) {
 		for (int i=0; i<TABLE1DATA.length; i++) {
 			if (TABLE1DATA[i][0].equals(candidateNumber+1)) {
 				TABLE1DATA[i][position] = data;
 			}
+		}
+	}
+	
+	private void startRoundAfterVote() {
+		try {
+			int numCandidates = socketInputStream.readByte();
+			int round = socketInputStream.readByte();
+			// If its 0 then do straw if its 1 then start buy after
+			for (int i = 0; i < numCandidates; i++) {
+				int candNum = socketInputStream.readByte();
+				int numVotes = socketInputStream.readByte();
+				addToTable1Data(candNum-1, round+3, numVotes); 
+				// FIXME add to the cell based on the round + standardize cand locations
+			}
+			if (round == 0) {
+				gui.removeScrollPane1();
+				gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
+				gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
+				gui.updateGUI();
+			} else if (round == 1) {
+				gui.removeScrollPane1();
+				gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
+				gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
+				gui.addEndRoundBtn(0);
+				gui.updateGUI();
+			}
+		} catch (IOException e) {
+			// Alert that it couldn't retrieve the player data
 		}
 	}
 
@@ -159,7 +200,7 @@ public class ClientHandler {
 		}
 	}
 
-	public void buyInfo(int candNum) {
+	private void buyInfo(int candNum) {
 		try {
 			socketOutputStream.writeChar((int) '!');
 			socketOutputStream.writeByte(5);
@@ -169,7 +210,7 @@ public class ClientHandler {
 		}
 	}
 
-	public void voteForCandidate(int candNum) {
+	private void voteForCandidate(int candNum) {
 		try {
 			socketOutputStream.writeChar((int) '!');
 			socketOutputStream.writeByte(9);

@@ -197,10 +197,8 @@ public class ClientJFrame extends JFrame {
 			char selectedParty = (Character) table1.getModel().getValueAt(selectedRow, 1);
 			if (party == selectedParty) {
 				if (budget >= 2 * 500) {
-					int selectedCand = (Integer) table2.getModel().getValueAt(
-							selectedRow, 0) - 1;
-					PCS.firePropertyChange("Buy Info", selectedCand, true); // Same
-																			// party
+					int selectedCand = (Integer) table2.getModel().getValueAt(selectedRow, 0) - 1;
+					PCS.firePropertyChange("Buy Info", selectedCand, true); // Same party
 					budget -= 2 * 500;
 					lblBudget.setText("Budget: " + budget);
 				} else {
@@ -208,10 +206,8 @@ public class ClientJFrame extends JFrame {
 				}
 			} else {
 				if (budget >= 500) {
-					int selectedCand = (Integer) table2.getModel().getValueAt(
-							selectedRow, 0) - 1;
-					PCS.firePropertyChange("Buy Info", selectedCand, true); // Different
-																			// party
+					int selectedCand = (Integer) table2.getModel().getValueAt(selectedRow, 0) - 1;
+					PCS.firePropertyChange("Buy Info", selectedCand, true); // Different party
 					budget -= 500;
 					lblBudget.setText("Budget: " + budget);
 				} else {
@@ -252,8 +248,7 @@ public class ClientJFrame extends JFrame {
 					if (isPushed) {
 						int selectedRow = table2.getSelectedRow();
 						System.out.println("Selected row is: " + selectedRow);
-						((DefaultTableModel) table2.getModel())
-								.removeRow(selectedRow);
+						((DefaultTableModel) table2.getModel()).removeRow(selectedRow);
 						table2.revalidate();
 						table2.repaint();
 						isPushed = false;
