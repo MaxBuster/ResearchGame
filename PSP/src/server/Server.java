@@ -1,5 +1,8 @@
 package server;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -15,6 +18,8 @@ import model.Model;
 public class Server {
 	private static final Model MODEL = new Model();
 	private static ServerSocket serverSocket;
+	private final PropertyChangeSupport PCS = new PropertyChangeSupport(this);
+	private static ServerJFrame gui;
 
 	public Server() {
 		try {
@@ -22,6 +27,9 @@ public class Server {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		PCS.addPropertyChangeListener(new ChangeListener());
+		gui = new ServerJFrame(PCS);
+		gui.setVisible(true);
 	}
 
 	public void run() {
@@ -55,6 +63,24 @@ public class Server {
 			}
 		};
 		thread.start();
+	}
+	
+	class ChangeListener implements PropertyChangeListener {
+		@Override
+		public void propertyChange(PropertyChangeEvent PCE) {
+			if (PCE.getPropertyName() == "Set Graph Data") {
+				int[] graphData = (int[]) PCE.getNewValue();
+				// FIXME set graphdata in model
+			} else if (PCE.getPropertyName() == "Set Num Candidates") {
+				int numCandidates = (Integer) PCE.getNewValue();
+			} else if (PCE.getPropertyName() == "Set Budget") {
+				int budget = (Integer) PCE.getNewValue();
+			} else if (PCE.getPropertyName() == "Set File Name") {
+				String fileName = (String) PCE.getNewValue();
+			} else if (PCE.getPropertyName() == "Start Game") {
+				// FIXME Start game
+			}
+		}
 	}
 
 	public static void main(String[] args) {

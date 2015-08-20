@@ -1,0 +1,59 @@
+package server;
+
+import java.beans.PropertyChangeSupport;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import net.miginfocom.swing.MigLayout;
+import javax.swing.JTextField;
+
+public class ServerJFrame extends JFrame {
+	private PropertyChangeSupport PCS;
+	private JPanel contentPane;
+	private JTextField mean1Field;
+	private JTextField stdDev1Field;
+	private JTextField textField_1;
+	private JTextField textField_2;
+	
+	/**
+	 * Needs:
+	 * Fields for means+std dev of graph+submit
+	 * Num candidates+submit
+	 * Budget+submit
+	 * Round
+	 * Start game
+	 * Save data to filename+submit
+	 * 
+	 * Show the players + their actions?
+	 * Eventually option to delete player from the game
+	 */
+	
+	public ServerJFrame(PropertyChangeSupport PCS) {
+		this.PCS = PCS;
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 600, 600);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		contentPane.setLayout(new MigLayout("", "[grow,right][50px,grow,fill][50px,grow,fill][50px,grow,fill][50px,grow,fill][grow,left]", "[grow,top][][fill][fill][grow,fill][grow,fill][grow,fill][grow][][grow,bottom]"));
+		
+		textField_2 = new JTextField();
+		contentPane.add(textField_2, "cell 4 1,growx");
+		textField_2.setColumns(10);
+		
+		mean1Field = new JTextField();
+		contentPane.add(mean1Field, "cell 1 2,growx");
+		mean1Field.setColumns(10);
+		
+		stdDev1Field = new JTextField();
+		stdDev1Field.setText("Std");
+		contentPane.add(stdDev1Field, "cell 2 2,growx");
+		stdDev1Field.setColumns(10);
+		
+		textField_1 = new JTextField();
+		contentPane.add(textField_1, "cell 3 2,growx");
+		textField_1.setColumns(10);
+	}
+}

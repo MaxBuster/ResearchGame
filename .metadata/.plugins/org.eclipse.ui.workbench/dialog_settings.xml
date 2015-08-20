@@ -9,8 +9,8 @@
 		</list>
 	</section>
 	<section name="org.eclipse.ui.internal.QuickAccess">
-		<item value="847" key="dialogWidth"/>
-		<item value="474" key="dialogHeight"/>
+		<item value="853" key="dialogWidth"/>
+		<item value="480" key="dialogHeight"/>
 		<list key="orderedProviders">
 		</list>
 		<list key="textArray">
@@ -19,6 +19,8 @@
 		</list>
 		<list key="textEntries">
 		</list>
+	</section>
+	<section name="EditorSelectionDialog">
 	</section>
 	<section name="ImportExportAction">
 		<item value="org.eclipse.ui.wizards.import.FileSystem" key="ImportExportPage.STORE_SELECTED_IMPORT_WIZARD_ID"/>
