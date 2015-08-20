@@ -1,0 +1,39 @@
+package server;
+
+import model.Candidate;
+import model.Player;
+
+import com.orsoncharts.util.json.JSONArray;
+import com.orsoncharts.util.json.JSONObject;
+
+public class WriteDataOut {
+	JSONObject JSONFileString;
+	private Candidate[] candidates;
+	private Player[] players;
+	 
+	public WriteDataOut(Candidate[] candidates, Player[] players) {
+		JSONFileString = new JSONObject();
+		this.candidates = candidates;
+		this.players = players;
+	}
+	
+	public String createPlayerString() {
+		JSONArray JSONPlayerString = new JSONArray();
+		for (Player player : players) {
+			JSONPlayerString.add("Player Number: " + player.getPlayerNumber());
+			JSONPlayerString.add("Ideal Point: " + player.getIdealPt());
+			JSONPlayerString.add("Party: " + player.getParty());
+			// Do this for all of the other info
+		}
+		return "";
+	}
+	
+	
+	
+	JSONArray playerData = new JSONArray();
+	JSONArray candidateData = new JSONArray();
+	// Get all candidates
+	// Get all players
+	
+	// Write a comma separated list of all the data
+}
