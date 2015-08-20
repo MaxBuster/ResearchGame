@@ -48,6 +48,7 @@ public class ServerHandler {
 						startSecondBuy();
 					} else {
 						sendWinner();
+						model.writeDataOut();
 					}
 				} else {
 					// Exceptions?

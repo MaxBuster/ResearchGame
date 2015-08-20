@@ -47,6 +47,10 @@ public class ClientHandler {
 				} else if (messageType == 1) { // Getting graph data
 					getAndSetChart();
 				} else if (messageType == 2) { // Getting candidates and starting the game
+					String gameDescription = "There will five rounds: buy info, straw vote, first vote, buy info, second vote \n"
+											+ "The goal is to try to try to get the candidate to win with the closest ideal point to you \n"
+											+ "It is currently the first buy round. Candidates with the same party as you cost twice as much";
+					gui.setTextPane(gameDescription);
 					getAndSetCandidateInfo();
 					gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
 					gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
@@ -55,17 +59,24 @@ public class ClientHandler {
 				} else if (messageType == 6) { // Got info
 					getAndSetPurchasedInfo();
 				} else if (messageType == 8) { // Starting the straw vote
+					String strawVoteDescription = "It is now the straw vote. \n"
+											+ "Vote based on the information that you bought from the previous round. \n"
+											+ "This round will have no effect on the final winner, and is meant to give information about the other voters.";
+					gui.setTextPane(strawVoteDescription);
 					gui.removeScrollPane2();
 					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
 					gui.updateGUI();
 				} else if (messageType == 10) {
 					startRoundAfterVote();
 				} else if (messageType == 11) {
+					String finalVoteDescription = "This is the final vote round. \n"
+											+ "Whoever wins this round will win the election.";
+					gui.setTextPane(finalVoteDescription);
 					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
 					gui.updateGUI();
 				} else if (messageType == 13) {
 					int winningCandidate = socketInputStream.readByte() + 1; // FIXME This gets the wrong value
-					gui.setTextPane("The winner is: " + winningCandidate);
+					gui.setTextPane("The winner is: " + winningCandidate); // FIXME open in a dialog instead
 				} else {
 					// Read the rest and ignore
 				}
@@ -161,11 +172,16 @@ public class ClientHandler {
 				// FIXME add to the cell based on the round + standardize cand locations
 			}
 			if (round == 0) {
+				String firstVoteDescription = "This is the first real vote. \n"
+										+ "The top two candidates from this round will continue to the final vote.";
+				gui.setTextPane(firstVoteDescription);
 				gui.removeScrollPane1();
 				gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
 				gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
 				gui.updateGUI();
 			} else if (round == 1) {
+				String secondBuyDescription = "This is the final information purchase round.";
+				gui.setTextPane(secondBuyDescription);
 				gui.removeScrollPane1();
 				gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
 				gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");

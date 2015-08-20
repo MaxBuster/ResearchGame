@@ -12,17 +12,18 @@ public class Model {
 	private int sumDataPoints;
 	private ArrayList<Player> players;
 	private String round;
+	private boolean dataWritten = false;
 
 	public Model() {
-		candidates = new Candidate[4];
-		for (int i = 0; i < 4; i++) {
-			candidates[i] = newCandidate();
-		}
 		players = new ArrayList<Player>();
 		BiModalDist distribution = new BiModalDist(40, 40, 60);
 		points = distribution.getData();
 		sumPoints = distribution.getSumData();
 		sumDataPoints = distribution.getSum();
+		candidates = new Candidate[4];
+		for (int i = 0; i < 4; i++) {
+			candidates[i] = newCandidate();
+		}
 		round = "Buy";
 	}
 
@@ -47,7 +48,7 @@ public class Model {
 		return candidates;
 	}
 
-	public Player newPlayer() {
+	public synchronized Player newPlayer() {
 		int playerNum = getPlayerNumber();
 		char party = getParty();
 		int idealPt = getIdealPt();
@@ -101,5 +102,13 @@ public class Model {
 
 	public void setRound(String newRound) {
 		round = newRound;
+	}
+	
+	public synchronized void writeDataOut() {
+		if (!dataWritten) {
+			dataWritten = true;
+			WriteDataOut.createPlayerString(players);
+			WriteDataOut.createCandidateString(candidates);
+		}
 	}
 }
