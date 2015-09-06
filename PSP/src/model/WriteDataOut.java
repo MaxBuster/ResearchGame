@@ -13,7 +13,7 @@ import com.orsoncharts.util.json.JSONObject;
 public class WriteDataOut {
 	
 	@SuppressWarnings("unchecked")
-	public static void createPlayerString(ArrayList<Player> players) {
+	public static void createPlayerString(ArrayList<Player> players, String fileName) {
 		JSONObject JSONFileObject = new JSONObject();
 		for (Player player : players) {
 			JSONArray JSONPlayerArray = new JSONArray();
@@ -24,11 +24,11 @@ public class WriteDataOut {
 			JSONFileObject.put("Player Data", JSONPlayerArray);
 		}
 		String JSONFileString = JSONFileObject.toJSONString();
-		writeStringToFile(JSONFileString, "researchPlayerData.json");
+		writeStringToFile(JSONFileString, fileName);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void createCandidateString(Candidate[] candidates) {
+	public static void createCandidateString(Candidate[] candidates, String fileName) {
 		JSONObject JSONFileObject = new JSONObject();
 		for (Candidate candidate : candidates) {
 			JSONArray JSONCandidateArray = new JSONArray();
@@ -41,7 +41,7 @@ public class WriteDataOut {
 			JSONFileObject.put("Candidate Data", JSONCandidateArray);
 		}
 		String JSONFileString = JSONFileObject.toJSONString();
-		writeStringToFile(JSONFileString, "researchCandidateData.json");
+		writeStringToFile(JSONFileString, fileName);
 	}
 	
 	private static void writeStringToFile(String fileData, String fileName) {

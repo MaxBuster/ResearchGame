@@ -23,7 +23,7 @@ public class ServerHandler {
 	}
 
 	public void handleIO() {
-		// FIXME Wait to do this until the game has started
+		waitForGameStart();
 		startGame();
 		while (true) {
 			try {
@@ -47,8 +47,12 @@ public class ServerHandler {
 					} else if (player.getRound() == "first") {
 						startSecondBuy();
 					} else {
+						Candidate[] candidates = model.getCandidates();
+						for (Candidate candidate : candidates) {
+							System.out.println("Candidate: " + candidate.getCandidateNumber() + " got second round: " + candidate.getSecondVotes());
+						}
 						sendWinner();
-						model.writeDataOut();
+						model.writeDataOut(); // FIXME is this synchronized?
 					}
 				} else {
 					// Exceptions?
@@ -64,7 +68,7 @@ public class ServerHandler {
 			writeMessage(0, player.getPlayerNumber());
 			out.writeChar(player.getParty());
 			out.writeInt(player.getIdealPt());
-			out.writeInt(player.getBudget());
+			out.writeInt(model.getBudget());
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -128,26 +132,35 @@ public class ServerHandler {
 
 	private void startSecondBuy() {
 		try {
-			Candidate[] candidates = model.getCandidates();
-			for (int i = 0; i < candidates.length; i++) { // FIXME Do this with a java sorter
-				Candidate thisCand = candidates[i];
-				for (int j = 0; j < candidates.length; j++) {
-					Candidate nextCand = candidates[j];
-					if (thisCand.getFirstVotes() > nextCand
-							.getFirstVotes()) {
-						candidates[j] = thisCand;
-						candidates[i] = nextCand;
-					}
-				}
-			}
-			writeMessage(10, 2); // 2 means that you write out the top two cands
+			int numCandidates = 2; // FIXME This is a hard coded two move on
+			Candidate[] candidates = model.getTopCandidates(numCandidates);
+			writeMessage(10, numCandidates); 
 			out.writeByte(1);
-			for (int i = 3; i > 1; i--) { // This writes the top two cands
-				out.writeByte(candidates[i].getCandidateNumber());
-				out.writeByte(candidates[i].getFirstVotes());
+			for (Candidate candidate : candidates) { // This writes the top candidates
+				out.writeByte(candidate.getCandidateNumber());
+				out.writeByte(candidate.getFirstVotes());
 			}
 		}  catch (IOException e) {
 			// Create alert about it
+		}
+	}
+	
+	private void waitForGameStart() {
+		synchronized (waitObject) {
+			if (!model.getStartGame()) {
+				try {
+					waitObject.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			waitObject.notifyAll();
+		}
+	}
+	
+	public static void notifyWaiters() {
+		synchronized (waitObject) {
+			waitObject.notifyAll();
 		}
 	}
 
@@ -203,12 +216,8 @@ public class ServerHandler {
 	}
 	
 	private void sendWinner() {
-		Candidate[] candidates = model.getCandidates();
-		if (candidates[3].getSecondVotes() > candidates[2].getSecondVotes()) { // FIXME Future proof this for >2 cands
-			writeMessage(13, candidates[3].getCandidateNumber()); // Writes out the winner
-		} else {
-			writeMessage(13, candidates[2].getCandidateNumber()); // Writes out the winner
-		}
+		Candidate winner = model.getWinner();
+		writeMessage(13, winner.getCandidateNumber()); // Writes out the winner
 	}
 
 	private void writeMessage(int type, int message) {

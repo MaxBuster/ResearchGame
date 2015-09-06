@@ -80,7 +80,7 @@ public class ClientJFrame extends JFrame {
 		JLabel lblIdealPoint = new JLabel("Ideal Point: " + idealPt);
 		contentPane.add(lblIdealPoint, "cell 3 1");
 
-		lblBudget = new JLabel("Budget: " + this.budget);
+		lblBudget = new JLabel("Budget: " + budget);
 		contentPane.add(lblBudget, "cell 4 1");
 		this.budget = budget;
 	}
@@ -194,36 +194,26 @@ public class ClientJFrame extends JFrame {
 
 		public void fireBuy() {
 			int selectedRow = table2.getSelectedRow();
-			char selectedParty = (Character) table1.getModel().getValueAt(selectedRow, 1);
-			if (party == selectedParty) {
-				if (budget >= 2 * 500) {
-					int selectedCand = (Integer) table2.getModel().getValueAt(selectedRow, 0) - 1;
-					PCS.firePropertyChange("Buy Info", selectedCand, true); // Same party
-					budget -= 2 * 500;
-					lblBudget.setText("Budget: " + budget);
-				} else {
-					// Open dialog - not enough money
-				}
+			int price = (Integer) table2.getModel().getValueAt(selectedRow, 1);
+			if (budget >= price) {
+				int selectedCand = (Integer) table2.getModel().getValueAt(selectedRow, 0) - 1;
+				PCS.firePropertyChange("Buy Info", selectedCand, true); // Same party
+				budget -= price;
+				lblBudget.setText("Budget: " + budget);
 			} else {
-				if (budget >= 500) {
-					int selectedCand = (Integer) table2.getModel().getValueAt(selectedRow, 0) - 1;
-					PCS.firePropertyChange("Buy Info", selectedCand, true); // Different party
-					budget -= 500;
-					lblBudget.setText("Budget: " + budget);
-				} else {
-					// Open dialog - not enough money
-				}
+				// Open dialog - not enough money
 			}
 		}
 
 		public void fireVote() {
 			isPushed = false;
 			int selectedRow = table2.getSelectedRow();
+			int selectedCand = (Integer) table2.getModel().getValueAt(selectedRow, 0) - 1;
 			contentPane.remove(scrollPane2);
 			contentPane.remove(scrollPane1);
 			contentPane.revalidate();
 			contentPane.repaint();
-			PCS.firePropertyChange("Vote", selectedRow, null);
+			PCS.firePropertyChange("Vote", selectedCand, null);
 		}
 
 		public Component getTableCellEditorComponent(JTable table,

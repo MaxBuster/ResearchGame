@@ -28,6 +28,8 @@ public class Server {
 			e.printStackTrace();
 		}
 		PCS.addPropertyChangeListener(new ChangeListener());
+		
+		MODEL.setStartGame(false);
 		gui = new ServerJFrame(PCS);
 		gui.setVisible(true);
 	}
@@ -70,15 +72,20 @@ public class Server {
 		public void propertyChange(PropertyChangeEvent PCE) {
 			if (PCE.getPropertyName() == "Set Graph Data") {
 				int[] graphData = (int[]) PCE.getNewValue();
-				// FIXME set graphdata in model
+				MODEL.setGraphData(graphData);
 			} else if (PCE.getPropertyName() == "Set Num Candidates") {
 				int numCandidates = (Integer) PCE.getNewValue();
+				MODEL.setNumCandidates(numCandidates);
 			} else if (PCE.getPropertyName() == "Set Budget") {
 				int budget = (Integer) PCE.getNewValue();
+				MODEL.setBudget(budget);
 			} else if (PCE.getPropertyName() == "Set File Name") {
 				String fileName = (String) PCE.getNewValue();
+				MODEL.setFileName(fileName);
 			} else if (PCE.getPropertyName() == "Start Game") {
-				// FIXME Start game
+				MODEL.setStartGame(true);
+				ServerHandler.notifyWaiters();
+				gui.setRound("First Buy");
 			}
 		}
 	}

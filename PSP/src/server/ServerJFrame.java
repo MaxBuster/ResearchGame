@@ -54,7 +54,6 @@ public class ServerJFrame extends JFrame {
 
 		roundLabel = new JLabel("Game not started yet");
 		contentPane.add(roundLabel, "cell 3 1");
-		// FIXME add method to update this label
 		
 		mean1Field = new JTextField();
 		mean1Field.setText("Mean 1");
@@ -146,6 +145,14 @@ public class ServerJFrame extends JFrame {
 		
 		budgetField = new JTextField();
 		budgetField.setText("Budget");
+		budgetField.addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(MouseEvent e){
+				if (budgetField.getText().equals("Budget")) {
+					budgetField.setText("");
+				} 
+			}
+		});
 		contentPane.add(budgetField, "cell 3 4,growx");
 		budgetField.setColumns(10);
 		
@@ -187,6 +194,10 @@ public class ServerJFrame extends JFrame {
 			}
 		});
 		contentPane.add(startGame, "cell 1 7");
+	}
+	
+	public void setRound(String round) {
+		roundLabel.setText("Round: " + round);
 	}
 	
 	public void updateGUI() {
