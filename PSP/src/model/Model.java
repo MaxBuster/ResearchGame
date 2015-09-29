@@ -1,26 +1,30 @@
 package model;
 
+import java.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
 public class Model {
+	private PropertyChangeSupport PCS;
 	private static int playerNumber;
 	private static int candidateNumber;
-	private static int budget = 2000;
+	private static int budget = 4;
 	private Candidate[] candidates;
 	private int[] points;
 	private int[] sumPoints;
 	private int sumDataPoints;
 	private ArrayList<Player> players;
-	private String round;
 	private boolean dataWritten = false;
 	private boolean startGame = true;
 	private int numCandidates = 4;
 	private String fileName = "researchData.json";
 	private int[] graphData = new int[]{40, 5, 60, 5};
+	private int roundNum = 0;
+	private String[] roundNames = new String[]{"First Buy", "Straw Vote", "First Vote", "Second Buy", "Second Vote", "Over"};
 			
-	public Model() {
+	public Model(final PropertyChangeSupport PCS) {
+		this.PCS = PCS;
 		players = new ArrayList<Player>();
 		BiModalDist distribution = new BiModalDist(graphData);
 		points = distribution.getData();
@@ -30,7 +34,6 @@ public class Model {
 		for (int i = 0; i < numCandidates; i++) {
 			candidates[i] = newCandidate();
 		}
-		round = "Buy";
 	}
 	
 	public void setGraphData(int[] graphData) {
@@ -97,7 +100,12 @@ public class Model {
 		int idealPt = getIdealPt();
 		Player player = new Player(playerNum, party, idealPt, budget, numCandidates);
 		players.add(player);
+		PCS.firePropertyChange("New Player", null, playerNum);
 		return player;
+	}
+	
+	public void removePlayer(Player player) {
+		players.remove(player);
 	}
 
 	public int getPlayerNumber() {
@@ -129,7 +137,16 @@ public class Model {
 		return candidates[candNum];
 	}
 	
-	public Candidate[] getTopCandidates(int topXCandidates) { 
+	public Player getPlayer(int playerNum) {
+		for (Player player : players) {
+			if (player.getPlayerNumber() == playerNum) {
+				return player;
+			}
+		}
+		return null;
+	}
+	
+	public Candidate[] getSortedCandidates() { 
 		Candidate[] tempCands = Arrays.copyOf(this.candidates, this.candidates.length);
 		Arrays.sort(tempCands, new Comparator<Candidate> () {
 			@Override
@@ -141,7 +158,7 @@ public class Model {
 				}
 			}
 		});
-		return Arrays.copyOfRange(tempCands, numCandidates-topXCandidates, numCandidates);
+		return tempCands;
 	}
 	
 	public Candidate getWinner() {
@@ -166,15 +183,11 @@ public class Model {
 				done = false;
 			}
 		}
+		if (done == true) {
+			this.roundNum++;
+			PCS.firePropertyChange("New Round", null, this.roundNames[roundNum]);
+		}
 		return done;
-	}
-
-	public String getRound() {
-		return round;
-	}
-
-	public void setRound(String newRound) {
-		round = newRound;
 	}
 	
 	public synchronized void writeDataOut() {

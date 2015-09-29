@@ -20,7 +20,21 @@ public class WriteDataOut {
 			JSONPlayerArray.add("Player Number: " + player.getPlayerNumber());
 			JSONPlayerArray.add("Ideal Point: " + player.getIdealPt());
 			JSONPlayerArray.add("Party: " + player.getParty());
-			// Do this for all of the other info
+			
+			int[] playerInfo = player.getInfo();
+			JSONArray JSONPlayerInfo = new JSONArray();
+			for (int i=0; i<playerInfo.length; i++) {
+				JSONPlayerInfo.add("Candidate " + (i+1) + " info: " + playerInfo[i]);
+			}
+			JSONPlayerArray.add(JSONPlayerInfo);
+			
+			int[] playerVotes = player.getVotes();
+			JSONArray JSONPlayerVotes = new JSONArray();
+			for (int i=0; i<playerVotes.length; i++) {
+				JSONPlayerVotes.add("Round " + i + " candidate: " + playerVotes[i]);
+			}
+			JSONPlayerArray.add(JSONPlayerVotes);
+			
 			JSONFileObject.put("Player Data", JSONPlayerArray);
 		}
 		String JSONFileString = JSONFileObject.toJSONString();

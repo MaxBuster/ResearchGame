@@ -14,11 +14,12 @@ import org.jfree.data.xy.IntervalXYDataset;
 
 import model.BiModalDist;
 import model.Model;
+import model.Player;
 
 public class Server {
-	private static final Model MODEL = new Model();
-	private static ServerSocket serverSocket;
 	private final PropertyChangeSupport PCS = new PropertyChangeSupport(this);
+	private final Model MODEL = new Model(PCS);
+	private static ServerSocket serverSocket;
 	private static ServerJFrame gui;
 
 	public Server() {
@@ -86,6 +87,18 @@ public class Server {
 				MODEL.setStartGame(true);
 				ServerHandler.notifyWaiters();
 				gui.setRound("First Buy");
+			} else if (PCE.getPropertyName() == "New Player") {
+				int playerNumber = (Integer) PCE.getNewValue();
+				gui.addRowToPlayers(playerNumber);
+			} else if (PCE.getPropertyName() == "New Round") {
+				String newRound = (String) PCE.getNewValue();
+				gui.setRound(newRound);
+			} else if (PCE.getPropertyName() == "Remove Player") {
+				int playerNumber = (Integer) PCE.getNewValue();
+				Player playerToRemove = MODEL.getPlayer(playerNumber);
+				if (playerToRemove != null) {
+					MODEL.removePlayer(playerToRemove);
+				}
 			}
 		}
 	}

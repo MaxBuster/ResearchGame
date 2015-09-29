@@ -36,7 +36,7 @@ public class ClientJFrame extends JFrame {
 	private PropertyChangeSupport PCS;
 	private JPanel contentPane;
 	private char party = 'X';
-	private int budget = 2000;
+	private int budget = 4;
 	private JLabel lblBudget;
 	private JTextPane genericTextPane;
 

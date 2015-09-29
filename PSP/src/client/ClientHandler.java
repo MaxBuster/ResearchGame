@@ -123,10 +123,10 @@ public class ClientHandler {
 				char candidateParty = (char) socketInputStream.readByte();
 				int infoPrice;
 				if (candidateParty == party) { // FIXME change price based on budget too
-					infoPrice = 1000;
+					infoPrice = 2;
 				}
 				else {
-					infoPrice = 500;
+					infoPrice = 1;
 				}
 				TABLE2BUYDATA[i] = new Object[] {candidateNumber, infoPrice, "Buy"}; 
 				TABLE2VOTEDATA[i] = new Object[] {candidateNumber, "Vote"};
@@ -164,20 +164,16 @@ public class ClientHandler {
 		try {
 			int numCandidates = socketInputStream.readByte();
 			int round = socketInputStream.readByte();
-			Object[][] TempTable2BuyData = new Object[numCandidates][];
-			Object[][] TempTable2VoteData = new Object[numCandidates][];
 			// If its 0 then do straw if its 1 then start buy after
+			int[] candNums = new int[numCandidates];
 			for (int i = 0; i < numCandidates; i++) {
 				int candNum = socketInputStream.readByte();
 				int numVotes = socketInputStream.readByte();
 				addToTable1Data(candNum-1, round+3, numVotes); 
 				
-				TempTable2BuyData[i] = TABLE2BUYDATA[candNum-1];
-				TempTable2VoteData[i] = TABLE2VOTEDATA[candNum-1];
+				candNums[i] = candNum;
 				// FIXME add to the cell based on the round + standardize cand locations
 			}
-			TABLE2BUYDATA = TempTable2BuyData;
-			TABLE2VOTEDATA = TempTable2VoteData;
 			if (round == 0) {
 				String firstVoteDescription = "This is the first real vote. \n"
 										+ "The top two candidates from this round will continue to the final vote.";
@@ -187,6 +183,15 @@ public class ClientHandler {
 				gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
 				gui.updateGUI();
 			} else if (round == 1) {
+				Object[][] TempTable2BuyData = new Object[2][]; // FIXME this is hardcoded
+				Object[][] TempTable2VoteData = new Object[2][];
+				TempTable2BuyData[0] = TABLE2BUYDATA[candNums[numCandidates-1]-1];
+				TempTable2VoteData[0] = TABLE2VOTEDATA[candNums[numCandidates-1]-1];
+				TempTable2BuyData[1] = TABLE2BUYDATA[candNums[numCandidates-2]-1];
+				TempTable2VoteData[1] = TABLE2VOTEDATA[candNums[numCandidates-2]-1];
+				TABLE2BUYDATA = TempTable2BuyData;
+				TABLE2VOTEDATA = TempTable2VoteData;
+				
 				String secondBuyDescription = "This is the final information purchase round.";
 				gui.setTextPane(secondBuyDescription);
 				gui.removeScrollPane1();

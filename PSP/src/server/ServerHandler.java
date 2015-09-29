@@ -47,10 +47,6 @@ public class ServerHandler {
 					} else if (player.getRound() == "first") {
 						startSecondBuy();
 					} else {
-						Candidate[] candidates = model.getCandidates();
-						for (Candidate candidate : candidates) {
-							System.out.println("Candidate: " + candidate.getCandidateNumber() + " got second round: " + candidate.getSecondVotes());
-						}
 						sendWinner();
 						model.writeDataOut(); // FIXME is this synchronized?
 					}
@@ -58,6 +54,7 @@ public class ServerHandler {
 					// Exceptions?
 				}
 			} catch (IOException e) {
+				removePlayer();
 				break; // End client
 			}
 		}
@@ -70,7 +67,7 @@ public class ServerHandler {
 			out.writeInt(player.getIdealPt());
 			out.writeInt(model.getBudget());
 		} catch (IOException e1) {
-			e1.printStackTrace();
+			removePlayer();
 		}
 		writeChartData();
 		Candidate[] candidates = model.getCandidates();
@@ -80,7 +77,7 @@ public class ServerHandler {
 				out.writeByte(candidates[i].getCandidateNumber());
 				out.writeByte(candidates[i].getParty());
 			} catch (IOException e) {
-				e.printStackTrace();
+				removePlayer();
 			}
 		}
 	}
@@ -91,12 +88,13 @@ public class ServerHandler {
 			Candidate candidate = model.getCandidate(candidateToBuyFrom);
 			int lowerBound = candidate.getLowerBound(); // FIXME generate these from the normal dist.
 			int upperBound = candidate.getUpperBound();
+			player.addInfo(candidateToBuyFrom, 1);
 
 			writeMessage(6, candidateToBuyFrom);
 			out.writeInt(lowerBound);
 			out.writeInt(upperBound);
 		} catch (IOException e) {
-			// Create alert about it
+			removePlayer();
 		}
 	}
 
@@ -105,13 +103,16 @@ public class ServerHandler {
 			int candidateToVoteFor = in.readByte();
 			if (player.getRound() == "first") {
 				model.getCandidate(candidateToVoteFor).voteFirst();
+				player.addVote(candidateToVoteFor, 1);
 			} else if (player.getRound() == "final") {
 				model.getCandidate(candidateToVoteFor).voteSecond();
+				player.addVote(candidateToVoteFor, 2);
 			} else {
 				model.getCandidate(candidateToVoteFor).voteStraw();
+				player.addVote(candidateToVoteFor, 0);
 			}
 		}  catch (IOException e) {
-			// Create alert about it
+			removePlayer();
 		}
 	}
 
@@ -126,22 +127,21 @@ public class ServerHandler {
 				out.writeByte(candidate.getStrawVotes());
 			}
 		}  catch (IOException e) {
-			// Create alert about it
+			removePlayer();
 		}
 	}
 
 	private void startSecondBuy() {
 		try {
-			int numCandidates = 2; // FIXME This is a hard coded two move on
-			Candidate[] candidates = model.getTopCandidates(numCandidates);
-			writeMessage(10, numCandidates); 
+			Candidate[] candidates = model.getSortedCandidates();
+			writeMessage(10, candidates.length); 
 			out.writeByte(1);
 			for (Candidate candidate : candidates) { // This writes the top candidates
 				out.writeByte(candidate.getCandidateNumber());
 				out.writeByte(candidate.getFirstVotes());
 			}
 		}  catch (IOException e) {
-			// Create alert about it
+			removePlayer();
 		}
 	}
 	
@@ -196,7 +196,7 @@ public class ServerHandler {
 				out.writeByte(11); // This starts final round
 			}
 		} catch (IOException e) {
-
+			removePlayer();
 		}
 	}
 
@@ -211,7 +211,7 @@ public class ServerHandler {
 				out.writeInt(chartData[i]);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			removePlayer();
 		}
 	}
 	
@@ -226,7 +226,14 @@ public class ServerHandler {
 			out.writeByte(type);
 			out.writeByte(message);
 		} catch (IOException e) {
-			e.printStackTrace();
+			removePlayer();
+		}
+	}
+	
+	private void removePlayer() {
+		model.removePlayer(player);
+		if (model.checkEndRound()) {
+			notifyWaiters();
 		}
 	}
 }

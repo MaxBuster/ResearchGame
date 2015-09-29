@@ -6,8 +6,8 @@ public class Player {
 	private int idealPt;
 	private int budget;
 	
-	private int[][] infoPurchased;
-	private int[][] votes;
+	private int[] info;
+	private int[] votes;
 	
 	private boolean doneWithRound;
 	private String round;
@@ -20,8 +20,8 @@ public class Player {
 		this.budget = budget;
 		this.round = "straw";
 		this.doneWithRound = false;
-		this.infoPurchased = new int[numCandidates][2];
-		this.votes = new int[numCandidates][3];
+		this.info = new int[numCandidates];
+		this.votes = new int[3];
 	}
 
 	public int getPlayerNumber() {
@@ -43,9 +43,25 @@ public class Player {
 	public void spendBudget(int amount) {
 		budget -= amount;
 	}
+	
+	public void addInfo(int candidateNum, int info) {
+		this.info[candidateNum] = info;
+	}
+	
+	public int[] getInfo() {
+		return this.info;
+	}
 
 	public void doneWithRound() {
 		this.doneWithRound = true;
+	}
+	
+	public void addVote(int candidateNum, int roundNum) {
+		this.votes[roundNum] = candidateNum+1;
+	}
+	
+	public int[] getVotes() {
+		return this.votes;
 	}
 	
 	public void setRound(String newRound) {
