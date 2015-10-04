@@ -34,8 +34,8 @@ public class ServerJFrame extends JFrame {
 	private JTextField mean2Field;
 	private JTextField stdDev2Field;
 	private JButton submitGraph;
-	private JTextField numCandidatesField;
-	private JButton submitNumCandidates;
+	private JTextField candidateField;
+	private JButton submitCandidate;
 	private JTextField budgetField;
 	private JButton submitBudget;
 	private JLabel roundLabel;
@@ -135,27 +135,27 @@ public class ServerJFrame extends JFrame {
 		});
 		contentPane.add(submitGraph, "cell 5 2");
 		
-		numCandidatesField = new JTextField();
-		numCandidatesField.setText("# Candidates");
-		numCandidatesField.addMouseListener(new MouseAdapter(){
+		candidateField = new JTextField();
+		candidateField.setText("Candidate Ideal Pt");
+		candidateField.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e){
-				if (numCandidatesField.getText().equals("# Candidates")) {
-					numCandidatesField.setText("");
+				if (candidateField.getText().equals("Candidate Ideal Pt")) {
+					candidateField.setText("");
 				} 
 			}
 		});
-		contentPane.add(numCandidatesField, "cell 1 4,growx");
-		numCandidatesField.setColumns(10);
+		contentPane.add(candidateField, "cell 1 4,growx");
+		candidateField.setColumns(10);
 		
-		submitNumCandidates = new JButton("Submit");
-		submitNumCandidates.addActionListener(new ActionListener() {
+		submitCandidate = new JButton("Submit");
+		submitCandidate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int numCandidates = Integer.parseInt(numCandidatesField.getText());
-				PCS.firePropertyChange("Set Num Candidates", null, numCandidates);
+				int idealPt = Integer.parseInt(candidateField.getText());
+				PCS.firePropertyChange("Add Candidate", null, idealPt);
 			}
 		});
-		contentPane.add(submitNumCandidates, "cell 2 4");
+		contentPane.add(submitCandidate, "cell 2 4");
 		
 		budgetField = new JTextField();
 		budgetField.setText("Budget");

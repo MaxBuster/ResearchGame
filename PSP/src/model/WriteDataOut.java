@@ -42,7 +42,7 @@ public class WriteDataOut {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void createCandidateString(Candidate[] candidates, String fileName) {
+	public static void createCandidateString(ArrayList<Candidate> candidates, String fileName) {
 		JSONObject JSONFileObject = new JSONObject();
 		for (Candidate candidate : candidates) {
 			JSONArray JSONCandidateArray = new JSONArray();

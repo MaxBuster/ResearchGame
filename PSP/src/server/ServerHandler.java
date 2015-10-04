@@ -3,6 +3,7 @@ package server;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import model.Candidate;
 import model.Model;
@@ -70,12 +71,12 @@ public class ServerHandler {
 			removePlayer();
 		}
 		writeChartData();
-		Candidate[] candidates = model.getCandidates();
-		writeMessage(2, candidates.length);
-		for (int i = 0; i < candidates.length; i++) {
+		ArrayList<Candidate> candidates = model.getCandidates();
+		writeMessage(2, candidates.size());
+		for (int i = 0; i < candidates.size(); i++) {
 			try {
-				out.writeByte(candidates[i].getCandidateNumber());
-				out.writeByte(candidates[i].getParty());
+				out.writeByte(candidates.get(i).getCandidateNumber());
+				out.writeByte(candidates.get(i).getParty());
 			} catch (IOException e) {
 				removePlayer();
 			}
@@ -118,9 +119,9 @@ public class ServerHandler {
 
 	private void startFirstVote() {
 		try {
-			Candidate[] candidates = model.getCandidates();
+			ArrayList<Candidate> candidates = model.getCandidates();
 			player.setRound("first");
-			writeMessage(10, candidates.length);
+			writeMessage(10, candidates.size());
 			out.writeByte(0);
 			int numPlayers = model.getNumPlayers();
 			for (Candidate candidate : candidates) {
@@ -136,8 +137,8 @@ public class ServerHandler {
 
 	private void startSecondBuy() {
 		try {
-			Candidate[] candidates = model.getSortedCandidates();
-			writeMessage(10, candidates.length); 
+			ArrayList<Candidate> candidates = model.getSortedCandidates();
+			writeMessage(10, candidates.size()); 
 			out.writeByte(1);
 			int numPlayers = model.getNumPlayers();
 			for (Candidate candidate : candidates) { // This writes the top candidates

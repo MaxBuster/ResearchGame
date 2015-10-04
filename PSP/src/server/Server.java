@@ -74,9 +74,9 @@ public class Server {
 			if (PCE.getPropertyName() == "Set Graph Data") {
 				int[] graphData = (int[]) PCE.getNewValue();
 				MODEL.setGraphData(graphData);
-			} else if (PCE.getPropertyName() == "Set Num Candidates") {
-				int numCandidates = (Integer) PCE.getNewValue();
-				MODEL.setNumCandidates(numCandidates);
+			} else if (PCE.getPropertyName() == "Add Candidate") {
+				int idealPt = (Integer) PCE.getNewValue();
+				MODEL.addCandidate(idealPt);
 			} else if (PCE.getPropertyName() == "Set Budget") {
 				int budget = (Integer) PCE.getNewValue();
 				MODEL.setBudget(budget);
@@ -85,6 +85,7 @@ public class Server {
 				MODEL.setFileName(fileName);
 			} else if (PCE.getPropertyName() == "Start Game") {
 				MODEL.setStartGame(true);
+				MODEL.startGame();
 				ServerHandler.notifyWaiters();
 				gui.setRound("First Buy");
 			} else if (PCE.getPropertyName() == "New Player") {
