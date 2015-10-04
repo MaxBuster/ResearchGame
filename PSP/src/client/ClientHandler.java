@@ -168,8 +168,8 @@ public class ClientHandler {
 			int[] candNums = new int[numCandidates];
 			for (int i = 0; i < numCandidates; i++) {
 				int candNum = socketInputStream.readByte();
-				int numVotes = socketInputStream.readByte();
-				addToTable1Data(candNum-1, round+3, numVotes); 
+				int numVotes = socketInputStream.readInt();
+				addToTable1Data(candNum-1, round+3, numVotes+"%"); 
 				
 				candNums[i] = candNum;
 				// FIXME add to the cell based on the round + standardize cand locations

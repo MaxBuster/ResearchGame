@@ -137,6 +137,10 @@ public class Model {
 		return candidates[candNum];
 	}
 	
+	public int getNumPlayers() {
+		return players.size();
+	}
+	
 	public Player getPlayer(int playerNum) {
 		for (Player player : players) {
 			if (player.getPlayerNumber() == playerNum) {

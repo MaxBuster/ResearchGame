@@ -122,9 +122,12 @@ public class ServerHandler {
 			player.setRound("first");
 			writeMessage(10, candidates.length);
 			out.writeByte(0);
+			int numPlayers = model.getNumPlayers();
 			for (Candidate candidate : candidates) {
 				out.writeByte(candidate.getCandidateNumber());
-				out.writeByte(candidate.getStrawVotes());
+				int numVotes = candidate.getStrawVotes();
+				int percentVotes = ((numVotes*100)/numPlayers);
+				out.writeInt(percentVotes);
 			}
 		}  catch (IOException e) {
 			removePlayer();
@@ -136,9 +139,12 @@ public class ServerHandler {
 			Candidate[] candidates = model.getSortedCandidates();
 			writeMessage(10, candidates.length); 
 			out.writeByte(1);
+			int numPlayers = model.getNumPlayers();
 			for (Candidate candidate : candidates) { // This writes the top candidates
 				out.writeByte(candidate.getCandidateNumber());
-				out.writeByte(candidate.getFirstVotes());
+				int numVotes = candidate.getFirstVotes();
+				int percentVotes = ((numVotes*100)/numPlayers);
+				out.writeInt(percentVotes);
 			}
 		}  catch (IOException e) {
 			removePlayer();
