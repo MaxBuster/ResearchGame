@@ -76,7 +76,11 @@ public class ClientHandler {
 					gui.updateGUI();
 				} else if (messageType == 13) {
 					int winningCandidate = socketInputStream.readByte();
-					gui.setTextPane("The winner is: " + winningCandidate); // FIXME open in a dialog instead
+					boolean isClosest = socketInputStream.readBoolean();
+					if (isClosest) {
+						gui.increaseWinnings();
+					}
+					gui.setTextPane("The winner is: " + winningCandidate);
 				} else {
 					// Read the rest and ignore
 				}

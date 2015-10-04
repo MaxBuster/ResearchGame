@@ -179,6 +179,18 @@ public class Model {
 		});
 		return tempCands[numCandidates-1];
 	}
+	
+	public boolean winnerIsClosest(int playerIdeal, Candidate candidate) {
+		boolean isClosest = true;
+		int diffToBeat = Math.abs(playerIdeal-candidate.getIdealPt());
+		for (Candidate other : candidates) {
+			int currentDiff = Math.abs(playerIdeal-other.getIdealPt());
+			if (currentDiff < diffToBeat) {
+				isClosest = false;
+			}
+		}
+		return isClosest;
+	}
 
 	public synchronized boolean checkEndRound() {
 		boolean done = true;

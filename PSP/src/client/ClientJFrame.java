@@ -38,6 +38,8 @@ public class ClientJFrame extends JFrame {
 	private char party = 'X';
 	private int budget = 4;
 	private JLabel lblBudget;
+	private int winnings = 0;
+	private JLabel lblWinnings;
 	private JTextPane genericTextPane;
 
 	private JScrollPane scrollPane1;
@@ -56,12 +58,9 @@ public class ClientJFrame extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new MigLayout(
-			"",
-			"[grow,right][50px,grow,fill][50px,grow,fill][50px,grow,fill][50px,grow,fill][grow,left]",
-			"[grow,top][fill][fill][100px,grow,fill][100px,grow,fill][grow,fill][grow][][grow,bottom]"));
+		contentPane.setLayout(new MigLayout("", "[grow,right][50px,grow,fill][50px,grow,fill][50px,grow,fill][50px,grow,fill][50px,grow,fill][grow,left]", "[grow,top][fill][fill][100px,grow,fill][100px,grow,fill][grow,fill][grow][][grow,bottom]"));
 		genericTextPane = new JTextPane();
-		contentPane.add(genericTextPane, "cell 1 2 4 1,grow");
+		contentPane.add(genericTextPane, "cell 1 2 5 1,grow");
 		String startingMessage = "Please wait for the game to begin";
 		genericTextPane.setText(startingMessage);
 
@@ -83,6 +82,9 @@ public class ClientJFrame extends JFrame {
 		lblBudget = new JLabel("Budget: " + budget);
 		contentPane.add(lblBudget, "cell 4 1");
 		this.budget = budget;
+
+		lblWinnings = new JLabel("Winnings: " + winnings);
+		contentPane.add(lblWinnings, "cell 5 1");
 	}
 
 	public void setTextPane(String text) {
@@ -95,7 +97,7 @@ public class ClientJFrame extends JFrame {
 		MakeChart chart = new MakeChart("Distribution of Voters", data);
 		JFreeChart graph = chart.getChart();
 		ChartPanel pane = new ChartPanel(graph);
-		contentPane.add(pane, "cell 1 5 4 1,grow");
+		contentPane.add(pane, "cell 1 5 5 1,grow");
 	}
 	
 	public void updateGUI() {
@@ -109,7 +111,7 @@ public class ClientJFrame extends JFrame {
 		Dimension d = new Dimension(5, 5);
 		table1.setPreferredScrollableViewportSize(d);
 		scrollPane1 = new JScrollPane(table1);
-		contentPane.add(scrollPane1, "cell 1 3 4 1,grow");
+		contentPane.add(scrollPane1, "cell 1 3 5 1,grow");
 	}
 	
 	public void setScrollPane2(String[] columnNames, Object[][] data, String buttonColumn) {
@@ -122,7 +124,7 @@ public class ClientJFrame extends JFrame {
 		Dimension d = new Dimension(5, 5);
 		table2.setPreferredScrollableViewportSize(d);
 		scrollPane2 = new JScrollPane(table2);
-		contentPane.add(scrollPane2, "cell 1 4 4 1,grow");
+		contentPane.add(scrollPane2, "cell 1 4 5 1,grow");
 	}
 
 	public void addEndRoundBtn(final int roundNum) {
@@ -134,7 +136,7 @@ public class ClientJFrame extends JFrame {
 				PCS.firePropertyChange("End Round", roundNum, null); // Sends which buy round ended
 			}
 		});
-		contentPane.add(btnEndRound, "cell 4 6");
+		contentPane.add(btnEndRound, "cell 5 6");
 	}
 	
 	public void removeScrollPane1() {
@@ -143,6 +145,12 @@ public class ClientJFrame extends JFrame {
 	
 	public void removeScrollPane2() {
 		contentPane.remove(scrollPane2);
+	}
+	
+	public void increaseWinnings() {
+		winnings++;
+		lblWinnings.setText("Winnings: " + winnings);
+		updateGUI();
 	}
 
 	class ButtonRenderer extends JButton implements TableCellRenderer {

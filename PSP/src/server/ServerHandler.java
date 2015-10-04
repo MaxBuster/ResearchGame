@@ -224,6 +224,12 @@ public class ServerHandler {
 	private void sendWinner() {
 		Candidate winner = model.getWinner();
 		writeMessage(13, winner.getCandidateNumber()); // Writes out the winner
+		boolean isClosest = model.winnerIsClosest(player.getIdealPt(), winner);
+		try {
+			out.writeBoolean(isClosest);
+		} catch (IOException e) {
+			removePlayer();
+		}
 	}
 
 	private void writeMessage(int type, int message) {
