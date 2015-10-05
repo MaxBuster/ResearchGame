@@ -109,7 +109,7 @@ public class ClientHandler {
 			for (int i = 0; i < numPoints; i++) {
 				chartData[i] = socketInputStream.readInt();
 			}
-			gui.addChart(chartData);
+			gui.addChart(chartData, idealPt);
 		} catch (IOException e) {
 			// Alert that it couldn't retrieve the player data
 		}

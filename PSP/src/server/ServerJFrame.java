@@ -47,16 +47,6 @@ public class ServerJFrame extends JFrame {
 	private String[] columnNames = new String[]{"Player #", "Remove"};
 	private Object[][] data = new Object[0][2];
 
-	/**
-	 * Needs:
-	 * Round
-	 * Start game
-	 * Save data to filename+submit
-	 * 
-	 * Show the players + their actions?
-	 * Eventually option to delete player from the game
-	 */
-
 	public ServerJFrame(final PropertyChangeSupport PCS) {
 		this.PCS = PCS;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

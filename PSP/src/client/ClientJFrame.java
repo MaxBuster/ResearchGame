@@ -1,5 +1,6 @@
 package client;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -31,6 +32,7 @@ import javax.swing.UIManager;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.ValueMarker;
 
 public class ClientJFrame extends JFrame {
 	private PropertyChangeSupport PCS;
@@ -47,6 +49,10 @@ public class ClientJFrame extends JFrame {
 
 	private JScrollPane scrollPane2;
 	private JTable table2;
+	
+	private MakeChart chart;
+	private JFreeChart graph;
+	private ChartPanel pane;
 
 	/**
 	 * Create the frame.
@@ -93,10 +99,16 @@ public class ClientJFrame extends JFrame {
 		genericTextPane.repaint();
 	}
 
-	public void addChart(int[] data) {
-		MakeChart chart = new MakeChart("Distribution of Voters", data);
-		JFreeChart graph = chart.getChart();
-		ChartPanel pane = new ChartPanel(graph);
+	public void addChart(int[] data, int idealPoint) {
+		chart = new MakeChart("Distribution of Voters", data);
+		graph = chart.getChart();
+		
+		ValueMarker marker = new ValueMarker(idealPoint);  
+		marker.setPaint(Color.black);
+		marker.setLabel("Ideal Pt");
+		graph.getXYPlot().addDomainMarker(marker);
+		
+		pane = new ChartPanel(graph);
 		contentPane.add(pane, "cell 1 5 5 1,grow");
 	}
 	
