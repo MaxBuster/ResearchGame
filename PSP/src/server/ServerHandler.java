@@ -15,6 +15,7 @@ public class ServerHandler {
 	private DataInputStream in;
 	private DataOutputStream out;
 	private static Object waitObject = new Object();
+	private int gameNum = 0;
 
 	public ServerHandler(Model model, DataInputStream in, DataOutputStream out) {
 		this.model = model;
@@ -50,6 +51,12 @@ public class ServerHandler {
 					} else {
 						sendWinner();
 						model.writeDataOut(); // FIXME is this synchronized?
+						gameNum++;
+						if (gameNum < model.getNumGames()) {
+							// Create new candidates, reset round #s everywhere, update player values
+							player.setRound("straw");
+							startGame();
+						}
 					}
 				} else {
 					// Exceptions?

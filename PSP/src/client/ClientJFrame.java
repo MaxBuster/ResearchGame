@@ -39,6 +39,9 @@ public class ClientJFrame extends JFrame {
 	private JPanel contentPane;
 	private char party = 'X';
 	private int budget = 4;
+	private JLabel lblPlayerNumber;
+	private JLabel lblParty;
+	private JLabel lblIdealPoint;
 	private JLabel lblBudget;
 	private int winnings = 0;
 	private JLabel lblWinnings;
@@ -72,25 +75,46 @@ public class ClientJFrame extends JFrame {
 
 		table1 = new JTable();
 		table2 = new JTable();
+
+		lblPlayerNumber = new JLabel("Player Number");
+		lblPlayerNumber.setVisible(false);
+		contentPane.add(lblPlayerNumber, "cell 1 1");
+		lblParty = new JLabel("Party");
+		lblParty.setVisible(false);
+		contentPane.add(lblParty, "cell 2 1");
+		lblIdealPoint = new JLabel("Ideal Point");
+		lblIdealPoint.setVisible(false);
+		contentPane.add(lblIdealPoint, "cell 3 1");
+		lblBudget = new JLabel("Budget");
+		lblBudget.setVisible(false);
+		contentPane.add(lblBudget, "cell 4 1");
+		lblWinnings = new JLabel("Winnings");
+		lblWinnings.setVisible(false);
+		contentPane.add(lblWinnings, "cell 5 1");
+
+		chart = new MakeChart("New", new int[]{0});
+		pane = new ChartPanel(graph);
+		pane.setVisible(false);
+		contentPane.add(pane, "cell 1 5 5 1,grow");
 	}
 
 	public void addLabels(int playerNum, char party, int idealPt, int budget) {
-		JLabel lblPlayerNumber = new JLabel("Player Number: " + playerNum);
-		contentPane.add(lblPlayerNumber, "cell 1 1");
+		lblPlayerNumber.setText("Player Number: " + playerNum);
+		lblPlayerNumber.setVisible(true);
 
-		JLabel lblParty = new JLabel("Party: " + party);
-		contentPane.add(lblParty, "cell 2 1");
+		lblParty.setText("Party: " + party);
+		lblParty.setVisible(true);
 		this.party = party;
 
-		JLabel lblIdealPoint = new JLabel("Ideal Point: " + idealPt);
-		contentPane.add(lblIdealPoint, "cell 3 1");
-
-		lblBudget = new JLabel("Budget: " + budget);
-		contentPane.add(lblBudget, "cell 4 1");
+		lblIdealPoint.setText("Ideal Point: " + idealPt);
+		lblIdealPoint.setVisible(true);
+		
+		lblBudget.setText("Budget: " + budget);
+		lblBudget.setVisible(true);
 		this.budget = budget;
 
-		lblWinnings = new JLabel("Winnings: " + winnings);
-		contentPane.add(lblWinnings, "cell 5 1");
+		lblWinnings.setText("Winnings: " + winnings);
+		lblWinnings.setVisible(true);
 	}
 
 	public void setTextPane(String text) {
@@ -108,8 +132,8 @@ public class ClientJFrame extends JFrame {
 		marker.setLabel("Ideal Pt");
 		graph.getXYPlot().addDomainMarker(marker);
 		
-		pane = new ChartPanel(graph);
-		contentPane.add(pane, "cell 1 5 5 1,grow");
+		pane.setChart(graph);
+		pane.setVisible(true);
 	}
 	
 	public void updateGUI() {

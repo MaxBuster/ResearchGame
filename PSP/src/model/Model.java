@@ -25,7 +25,8 @@ public class Model {
 	private int[] graphData = new int[]{40, 5, 60, 5};
 	private int roundNum = 0;
 	private String[] roundNames = new String[]{"First Buy", "Straw Vote", "First Vote", "Second Buy", "Second Vote", "Over"};
-			
+	private int numGames = 5;
+	
 	public Model(final PropertyChangeSupport PCS) {
 		this.PCS = PCS;
 		players = new ArrayList<Player>();
@@ -224,10 +225,14 @@ public class Model {
 			}
 		}
 		if (done == true) {
-			this.roundNum++;
+			roundNum = (roundNum+1)%6;
 			PCS.firePropertyChange("New Round", null, this.roundNames[roundNum]);
 		}
 		return done;
+	}
+	
+	public int getNumGames() {
+		return numGames;
 	}
 	
 	public synchronized void writeDataOut() {
