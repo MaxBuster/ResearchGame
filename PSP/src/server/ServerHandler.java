@@ -50,11 +50,12 @@ public class ServerHandler {
 						startSecondBuy();
 					} else {
 						sendWinner();
-						model.writeDataOut(); // FIXME is this synchronized?
+						model.writeDataOut(); 
 						gameNum++;
 						if (gameNum < model.getNumGames()) {
-							// Create new candidates, reset round #s everywhere, update player values
-							player.setRound("straw");
+							model.setNumCandidates(4);
+							removePlayer(); // FIXME change this in the future
+							player = model.newPlayer();
 							startGame();
 						}
 					}
