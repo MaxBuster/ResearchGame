@@ -14,11 +14,11 @@ public class ClientHandler {
 	private DataInputStream socketInputStream;
 	private DataOutputStream socketOutputStream;
 	private ClientJFrame gui;
-	
+
 	private final String[] TABLE2BUYNAMES = {"Candidate #", "Price", "Buy"};
 	private final String[] TABLE2VOTENAMES = {"Candidate #", "Vote"};
 	private final String[] TABLE1NAMES = {"Candidate #", "Party", "Ideal Point", "Straw Votes", "First Round Votes"};
-	
+
 	private Object[][] TABLE2BUYDATA;
 	private Object[][] TABLE2VOTEDATA;
 	private Object[][] TABLE1DATA;
@@ -27,7 +27,7 @@ public class ClientHandler {
 	private int idealPt;
 	private char party;
 	private int budget;
-	
+
 	public ClientHandler(DataInputStream socketInputStream, DataOutputStream socketOutputStream) {
 		PCS.addPropertyChangeListener(new ChangeListener());
 		this.socketInputStream = socketInputStream;
@@ -50,8 +50,8 @@ public class ClientHandler {
 					getAndSetChart();
 				} else if (messageType == 2) { // Getting candidates and starting the game
 					String gameDescription = "There will five rounds: buy info, straw vote, first vote, buy info, second vote \n"
-											+ "The goal is to try to try to get the candidate to win with the closest ideal point to you \n"
-											+ "It is currently the first buy round. Candidates with the same party as you cost twice as much";
+							+ "The goal is to try to try to get the candidate to win with the closest ideal point to you \n"
+							+ "It is currently the first buy round. Candidates with the same party as you cost twice as much";
 					gui.setTextPane(gameDescription);
 					getAndSetCandidateInfo();
 					gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
@@ -62,8 +62,8 @@ public class ClientHandler {
 					getAndSetPurchasedInfo();
 				} else if (messageType == 8) { // Starting the straw vote
 					String strawVoteDescription = "It is now the straw vote. \n"
-											+ "Vote based on the information that you bought from the previous round. \n"
-											+ "This round will have no effect on the final winner, and is meant to give information about the other voters.";
+							+ "Vote based on the information that you bought from the previous round. \n"
+							+ "This round will have no effect on the final winner, and is meant to give information about the other voters.";
 					gui.setTextPane(strawVoteDescription);
 					gui.removeScrollPane2();
 					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
@@ -72,7 +72,7 @@ public class ClientHandler {
 					startRoundAfterVote();
 				} else if (messageType == 11) {
 					String finalVoteDescription = "This is the final vote round. \n"
-											+ "Whoever wins this round will win the election.";
+							+ "Whoever wins this round will win the election.";
 					gui.setTextPane(finalVoteDescription);
 					gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
 					gui.updateGUI();
@@ -91,7 +91,7 @@ public class ClientHandler {
 			}
 		}
 	}
-	
+
 	private void getAndSetLabels() {
 		try {
 			playerNum = socketInputStream.readByte();
@@ -103,36 +103,41 @@ public class ClientHandler {
 			// Alert that it couldn't retrieve the player data
 		}
 	}
-	
+
 	private void getAndSetChart() {
 		try {
-			int numPoints = socketInputStream.readInt();
-			int[] chartData = new int[numPoints];
-			for (int i = 0; i < numPoints; i++) {
-				chartData[i] = socketInputStream.readInt();
+			int[] chartInfo = new int[4];
+			for (int i = 0; i < 4; i++) {
+				chartInfo[i] = socketInputStream.readInt();
 			}
+			int[] chartData = ClientBiModalDist.getData(chartInfo);
 			gui.addChart(chartData, idealPt);
 		} catch (IOException e) {
 			// Alert that it couldn't retrieve the player data
 		}
 	}
-	
+
 	private void getAndSetCandidateInfo() {
 		try {
 			int numCandidates = socketInputStream.readByte();
 			TABLE2BUYDATA = new Object[numCandidates][3];
 			TABLE2VOTEDATA = new Object[numCandidates][2];
 			TABLE1DATA = new Object[numCandidates][5];
-			
+
 			for (int i = 0; i < numCandidates; i++) {
 				int candidateNumber = socketInputStream.readByte();
 				char candidateParty = (char) socketInputStream.readByte();
 				int infoPrice;
-				if (candidateParty == party) { // FIXME change price based on budget too
+				if (candidateParty == party) { 
 					infoPrice = 2;
 				}
 				else {
 					infoPrice = 1;
+				}
+				int[] candidateExpectations  = BetaDist.getBetaDist(0, 0);
+				for (int candidate = 0; candidate < 4; candidate++) {
+					IntervalXYDataset dataset = MakeChart.createDataset(candidateExpectations, "Candidate " + (candidate+1));
+					gui.addDataset(candidate, dataset);
 				}
 				TABLE2BUYDATA[i] = new Object[] {candidateNumber, infoPrice, "Buy"}; 
 				TABLE2VOTEDATA[i] = new Object[] {candidateNumber, "Vote"};
@@ -142,17 +147,17 @@ public class ClientHandler {
 			// Alert that it couldn't retrieve the player data
 		}
 	}
-	
+
 	private void getAndSetPurchasedInfo() {
 		try {
 			int candidate = socketInputStream.readByte();
 			int tokens = socketInputStream.readInt();
 			int signals = socketInputStream.readInt();
-			
+
 			int expected = ((signals+1)*100)/(tokens+2);
 			int[] beta = BetaDist.getBetaDist(tokens, signals);
-			IntervalXYDataset data = MakeChart.createDataset(beta);
-			
+			IntervalXYDataset data = MakeChart.createDataset(beta, "Candidate " + (candidate+1));
+
 			addToTable1Data(candidate, 2, expected);
 			gui.removeScrollPane1();
 			gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
@@ -162,7 +167,7 @@ public class ClientHandler {
 			// Alert that it couldn't retrieve the player data
 		}
 	}
-	
+
 	private void addToTable1Data(int candidateNumber, int position, Object data) {
 		for (int i=0; i<TABLE1DATA.length; i++) {
 			if (TABLE1DATA[i][0].equals(candidateNumber+1)) {
@@ -170,7 +175,7 @@ public class ClientHandler {
 			}
 		}
 	}
-	
+
 	private void startRoundAfterVote() {
 		try {
 			int numCandidates = socketInputStream.readByte();
@@ -181,13 +186,12 @@ public class ClientHandler {
 				int candNum = socketInputStream.readByte();
 				int numVotes = socketInputStream.readInt();
 				addToTable1Data(candNum-1, round+3, numVotes+"%"); 
-				
+
 				candNums[i] = candNum;
-				// FIXME add to the cell based on the round + standardize cand locations
 			}
 			if (round == 0) {
 				String firstVoteDescription = "This is the first real vote. \n"
-										+ "The top two candidates from this round will continue to the final vote.";
+						+ "The top two candidates from this round will continue to the final vote.";
 				gui.setTextPane(firstVoteDescription);
 				gui.removeScrollPane1();
 				gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
@@ -202,7 +206,7 @@ public class ClientHandler {
 				TempTable2VoteData[1] = TABLE2VOTEDATA[candNums[numCandidates-2]-1];
 				TABLE2BUYDATA = TempTable2BuyData;
 				TABLE2VOTEDATA = TempTable2VoteData;
-				
+
 				String secondBuyDescription = "This is the final information purchase round.";
 				gui.setTextPane(secondBuyDescription);
 				gui.removeScrollPane1();
@@ -231,7 +235,7 @@ public class ClientHandler {
 					socketOutputStream.writeChar((int) '!');
 					socketOutputStream.writeByte(7); // End buy round
 					socketOutputStream.writeByte(whichRound); // Which buy round
-																// is ending
+					// is ending
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

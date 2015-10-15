@@ -80,7 +80,7 @@ public class Model {
 	}
 	
 	public int[] getData() {
-		return points;
+		return graphData;
 	}
 
 	public Candidate newCandidate() {

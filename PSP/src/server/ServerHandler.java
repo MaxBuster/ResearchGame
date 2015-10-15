@@ -222,12 +222,10 @@ public class ServerHandler {
 
 	private void writeChartData() {
 		int[] chartData = model.getData();
-		int chartSize = chartData.length;
 		try {
 			out.writeByte((int) '!');
 			out.writeByte(1);
-			out.writeInt(chartSize);
-			for (int i = 0; i < chartSize; i++) {
+			for (int i = 0; i < 4; i++) {
 				out.writeInt(chartData[i]);
 			}
 		} catch (IOException e) {

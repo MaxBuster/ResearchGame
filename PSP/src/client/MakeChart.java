@@ -23,7 +23,7 @@ public class MakeChart extends ApplicationFrame {
 
 	public MakeChart(final String title, int[] chartData) {
 		super(title);
-		IntervalXYDataset dataset = createDataset(chartData);
+		IntervalXYDataset dataset = createDataset(chartData, "Voters");
 		chart = createChart(dataset);
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
@@ -34,8 +34,8 @@ public class MakeChart extends ApplicationFrame {
 		return chart;
 	}
 
-	public static IntervalXYDataset createDataset(int[] data) {
-		final XYSeries series = new XYSeries("Random Data");
+	public static IntervalXYDataset createDataset(int[] data, String dataName) {
+		final XYSeries series = new XYSeries(dataName);
 		for (int i = 0; i < data.length; i++) {
 			series.add(i, data[i]);
 		}
@@ -45,8 +45,8 @@ public class MakeChart extends ApplicationFrame {
 
 	private JFreeChart createChart(IntervalXYDataset dataset) {
 		final JFreeChart chart = ChartFactory.createXYLineChart(
-				"Voter Distribution", "Ideal Point", "Number of Voters", dataset,
-				PlotOrientation.VERTICAL, false, false, false);
+				"Expectations", "Ideal Point", "Distribution", dataset,
+				PlotOrientation.VERTICAL, true, false, false);
 		return chart;
 	}
 }

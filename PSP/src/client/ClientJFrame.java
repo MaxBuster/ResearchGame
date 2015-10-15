@@ -32,6 +32,7 @@ import javax.swing.UIManager;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.IntervalXYDataset;
@@ -143,7 +144,8 @@ public class ClientJFrame extends JFrame {
 		
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(); 
 		renderer.setSeriesShapesVisible(0, false);
-		renderer.setSeriesPaint(0, Color.blue);
+		Color[] colors = new Color[]{Color.blue, Color.yellow, Color.green, Color.orange};
+		renderer.setSeriesPaint(0, colors[candidate]);
 		graph.getXYPlot().setRenderer(candidate+1, renderer); 
 	}
 	
