@@ -95,13 +95,18 @@ public class ServerHandler {
 		try {
 			int candidateToBuyFrom = in.readInt();
 			Candidate candidate = model.getCandidate(candidateToBuyFrom);
-			int lowerBound = candidate.getLowerBound(); // FIXME generate these from the normal dist.
-			int upperBound = candidate.getUpperBound();
-			player.addInfo(candidateToBuyFrom, 1);
+			int ideal = candidate.getIdealPt();
+			int random = (int) (Math.random()*100);
+			int signal = (random > ideal) ? 0 : 1;
+			player.addInfo(candidateToBuyFrom, signal);
+			int[] info = player.getInfo(candidateToBuyFrom);
+			
+			int tokens = info[0] + info[1]; 
+			int signals = info[1];
 
 			writeMessage(6, candidateToBuyFrom);
-			out.writeInt(lowerBound);
-			out.writeInt(upperBound);
+			out.writeInt(tokens);
+			out.writeInt(signals);
 		} catch (IOException e) {
 			removePlayer();
 		}

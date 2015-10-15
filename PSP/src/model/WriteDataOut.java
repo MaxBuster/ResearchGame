@@ -21,7 +21,7 @@ public class WriteDataOut {
 			JSONPlayerArray.add("Ideal Point: " + player.getIdealPt());
 			JSONPlayerArray.add("Party: " + player.getParty());
 			
-			int[] playerInfo = player.getInfo();
+			int[][] playerInfo = player.getInfo();
 			JSONArray JSONPlayerInfo = new JSONArray();
 			for (int i=0; i<playerInfo.length; i++) {
 				JSONPlayerInfo.add("Candidate " + (i+1) + " info: " + playerInfo[i]);

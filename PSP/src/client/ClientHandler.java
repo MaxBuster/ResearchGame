@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import org.jfree.data.xy.IntervalXYDataset;
+
 public class ClientHandler {
 	private final PropertyChangeSupport PCS = new PropertyChangeSupport(this);
 	private DataInputStream socketInputStream;
@@ -144,12 +146,17 @@ public class ClientHandler {
 	private void getAndSetPurchasedInfo() {
 		try {
 			int candidate = socketInputStream.readByte();
-			int lowerBound = socketInputStream.readInt();
-			int upperBound = socketInputStream.readInt();
-			String info = lowerBound + " - " + upperBound;
-			addToTable1Data(candidate, 2, info);
+			int tokens = socketInputStream.readInt();
+			int signals = socketInputStream.readInt();
+			
+			int expected = ((signals+1)*100)/(tokens+2);
+			int[] beta = BetaDist.getBetaDist(tokens, signals);
+			IntervalXYDataset data = MakeChart.createDataset(beta);
+			
+			addToTable1Data(candidate, 2, expected);
 			gui.removeScrollPane1();
 			gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
+			gui.addDataset(candidate, data);
 			gui.updateGUI();
 		} catch (IOException e) {
 			// Alert that it couldn't retrieve the player data

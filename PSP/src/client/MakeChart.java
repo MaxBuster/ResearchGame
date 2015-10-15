@@ -34,7 +34,7 @@ public class MakeChart extends ApplicationFrame {
 		return chart;
 	}
 
-	private IntervalXYDataset createDataset(int[] data) {
+	public static IntervalXYDataset createDataset(int[] data) {
 		final XYSeries series = new XYSeries("Random Data");
 		for (int i = 0; i < data.length; i++) {
 			series.add(i, data[i]);

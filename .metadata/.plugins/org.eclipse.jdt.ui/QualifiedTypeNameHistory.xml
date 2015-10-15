@@ -13,4 +13,11 @@
 <fullyQualifiedTypeName name="java.util.Comparator"/>
 <fullyQualifiedTypeName name="java.beans.PropertyChangeSupport"/>
 <fullyQualifiedTypeName name="model.Player"/>
+<fullyQualifiedTypeName name="java.util.Collections"/>
+<fullyQualifiedTypeName name="org.jfree.chart.plot.ValueMarker"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="org.apache.commons.math3.distribution.BetaDistribution"/>
+<fullyQualifiedTypeName name="client.MakeChart"/>
+<fullyQualifiedTypeName name="org.jfree.data.xy.IntervalXYDataset"/>
+<fullyQualifiedTypeName name="org.jfree.chart.renderer.xy.XYLineAndShapeRenderer"/>
 </qualifiedTypeNameHistroy>

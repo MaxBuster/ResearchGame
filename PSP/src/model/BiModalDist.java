@@ -17,14 +17,11 @@ public class BiModalDist {
 		int stdDev2 = graphData[3];
 		NormalDistribution normal1 = new NormalDistribution(mean1, stdDev1);
 		NormalDistribution normal2 = new NormalDistribution(mean2, stdDev2);
-		int previousInt = 0;
 		for (int i = 0; i < 100; i++) {
-			int nextInt = (int) (100*(50*normal1.cumulativeProbability(i) + 50*normal2.cumulativeProbability(i)));
-			int num = (nextInt - previousInt);
+			int num = (int) (100*(50*normal1.density(i) + 50*normal2.density(i)));
 			sum += num;
 			sumData[i] = sum;
 			data[i] = num;
-			previousInt = nextInt;
 		}
 	}
 

@@ -6,7 +6,7 @@ public class Player {
 	private int idealPt;
 	private int budget;
 	
-	private int[] info;
+	private int[][] info;
 	private int[] votes;
 	
 	private boolean doneWithRound;
@@ -20,7 +20,7 @@ public class Player {
 		this.budget = budget;
 		this.round = "straw";
 		this.doneWithRound = false;
-		this.info = new int[numCandidates];
+		this.info = new int[numCandidates][2];
 		this.votes = new int[3];
 	}
 
@@ -45,10 +45,14 @@ public class Player {
 	}
 	
 	public void addInfo(int candidateNum, int info) {
-		this.info[candidateNum] = info;
+		this.info[candidateNum][info]++;
 	}
 	
-	public int[] getInfo() {
+	public int[] getInfo(int candidateNum) {
+		return this.info[candidateNum];
+	}
+	
+	public int[][] getInfo() {
 		return this.info;
 	}
 

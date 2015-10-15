@@ -33,6 +33,8 @@ import javax.swing.UIManager;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.IntervalXYDataset;
 
 public class ClientJFrame extends JFrame {
 	private PropertyChangeSupport PCS;
@@ -136,6 +138,15 @@ public class ClientJFrame extends JFrame {
 		pane.setVisible(true);
 	}
 	
+	public void addDataset(int candidate, IntervalXYDataset data) {
+		graph.getXYPlot().setDataset(candidate+1, data);
+		
+		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(); 
+		renderer.setSeriesShapesVisible(0, false);
+		renderer.setSeriesPaint(0, Color.blue);
+		graph.getXYPlot().setRenderer(candidate+1, renderer); 
+	}
+	
 	public void updateGUI() {
 		contentPane.revalidate();
 		contentPane.repaint();
@@ -231,7 +242,7 @@ public class ClientJFrame extends JFrame {
 					} else if (label == "Vote") {
 						fireVote();
 					}
-					fireEditingStopped();
+					//fireEditingStopped();
 				}
 			});
 		}
@@ -280,11 +291,11 @@ public class ClientJFrame extends JFrame {
 				@Override
 				public void run() {
 					if (isPushed) {
-						int selectedRow = table2.getSelectedRow();
-						System.out.println("Selected row is: " + selectedRow);
-						((DefaultTableModel) table2.getModel()).removeRow(selectedRow);
-						table2.revalidate();
-						table2.repaint();
+//						int selectedRow = table2.getSelectedRow();
+//						System.out.println("Selected row is: " + selectedRow);
+//						((DefaultTableModel) table2.getModel()).removeRow(selectedRow);
+//						table2.revalidate();
+//						table2.repaint();
 						isPushed = false;
 					}
 				}
