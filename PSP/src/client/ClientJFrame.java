@@ -95,7 +95,7 @@ public class ClientJFrame extends JFrame {
 		lblWinnings.setVisible(false);
 		contentPane.add(lblWinnings, "cell 5 1");
 
-		chart = new MakeChart("New", new int[]{0});
+		chart = new MakeChart("New", new double[]{0});
 		pane = new ChartPanel(graph);
 		pane.setVisible(false);
 		contentPane.add(pane, "cell 1 5 5 1,grow");
@@ -126,8 +126,8 @@ public class ClientJFrame extends JFrame {
 		genericTextPane.repaint();
 	}
 
-	public void addChart(int[] data, int idealPoint) {
-		chart = new MakeChart("Distribution of Voters", data);
+	public void addChart(double[] chartData, int idealPoint) {
+		chart = new MakeChart("Distribution of Voters", chartData);
 		graph = chart.getChart();
 		
 		ValueMarker marker = new ValueMarker(idealPoint);  

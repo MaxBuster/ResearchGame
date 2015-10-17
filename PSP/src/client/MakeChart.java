@@ -7,6 +7,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.IntervalMarker;
+import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.IntervalXYDataset;
@@ -21,10 +22,13 @@ import org.jfree.ui.TextAnchor;
 public class MakeChart extends ApplicationFrame {
 	private JFreeChart chart;
 
-	public MakeChart(final String title, int[] chartData) {
+	public MakeChart(final String title, double[] is) {
 		super(title);
-		IntervalXYDataset dataset = createDataset(chartData, "Voters");
+		IntervalXYDataset dataset = createDataset(is, "Voters");
 		chart = createChart(dataset);
+		XYPlot plot = (XYPlot) chart.getPlot();
+		plot.getDomainAxis().setRange(0.00, 100);
+		plot.getRangeAxis().setRange(0.00, 2.00);
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
 		setContentPane(chartPanel);
@@ -34,10 +38,10 @@ public class MakeChart extends ApplicationFrame {
 		return chart;
 	}
 
-	public static IntervalXYDataset createDataset(int[] data, String dataName) {
+	public static IntervalXYDataset createDataset(double[] beta, String dataName) {
 		final XYSeries series = new XYSeries(dataName);
-		for (int i = 0; i < data.length; i++) {
-			series.add(i, data[i]);
+		for (int i = 0; i < beta.length; i++) {
+			series.add(i, beta[i]);
 		}
 		final XYSeriesCollection dataset = new XYSeriesCollection(series);
 		return dataset;

@@ -110,7 +110,7 @@ public class ClientHandler {
 			for (int i = 0; i < 4; i++) {
 				chartInfo[i] = socketInputStream.readInt();
 			}
-			int[] chartData = ClientBiModalDist.getData(chartInfo);
+			double[] chartData = ClientBiModalDist.getData(chartInfo);
 			gui.addChart(chartData, idealPt);
 		} catch (IOException e) {
 			// Alert that it couldn't retrieve the player data
@@ -134,7 +134,7 @@ public class ClientHandler {
 				else {
 					infoPrice = 1;
 				}
-				int[] candidateExpectations  = BetaDist.getBetaDist(0, 0);
+				double[] candidateExpectations  = BetaDist.getBetaDist(0, 0);
 				for (int candidate = 0; candidate < 4; candidate++) {
 					IntervalXYDataset dataset = MakeChart.createDataset(candidateExpectations, "Candidate " + (candidate+1));
 					gui.addDataset(candidate, dataset);
@@ -155,7 +155,7 @@ public class ClientHandler {
 			int signals = socketInputStream.readInt();
 
 			int expected = ((signals+1)*100)/(tokens+2);
-			int[] beta = BetaDist.getBetaDist(tokens, signals);
+			double[] beta = BetaDist.getBetaDist(tokens, signals);
 			IntervalXYDataset data = MakeChart.createDataset(beta, "Candidate " + (candidate+1));
 
 			addToTable1Data(candidate, 2, expected);
