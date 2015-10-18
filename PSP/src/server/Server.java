@@ -9,20 +9,26 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import org.jfree.data.xy.IntervalXYDataset;
 
 import model.BiModalDist;
+import model.GameInfo;
 import model.Model;
 import model.Player;
+import model.ReadConfig;
 
 public class Server {
 	private final PropertyChangeSupport PCS = new PropertyChangeSupport(this);
-	private final Model MODEL = new Model(PCS);
+	private Model model;
 	private static ServerSocket serverSocket;
 	private static ServerJFrame gui;
 
 	public Server() {
+		ArrayList<GameInfo> gameInfo = ReadConfig.readFile();
+		this.model = new Model(PCS, gameInfo);
+		
 		try {
 			serverSocket = new ServerSocket(10501);
 		} catch (IOException e) {
@@ -30,7 +36,7 @@ public class Server {
 		}
 		PCS.addPropertyChangeListener(new ChangeListener());
 		
-		MODEL.setStartGame(false);
+		// model.setStartGame(false); FIXME change this back in the future
 		gui = new ServerJFrame(PCS);
 		gui.setVisible(true);
 	}
@@ -55,7 +61,7 @@ public class Server {
 							clientSocket.getInputStream());
 					DataOutputStream out = new DataOutputStream(
 							clientSocket.getOutputStream());
-					ServerHandler serverHandler = new ServerHandler(MODEL, in,
+					ServerHandler serverHandler = new ServerHandler(model, in,
 							out);
 					serverHandler.handleIO();
 				} catch (EOFException e) {
@@ -73,19 +79,19 @@ public class Server {
 		public void propertyChange(PropertyChangeEvent PCE) {
 			if (PCE.getPropertyName() == "Set Graph Data") {
 				int[] graphData = (int[]) PCE.getNewValue();
-				MODEL.setGraphData(graphData);
+				model.setGraphData(graphData);
 			} else if (PCE.getPropertyName() == "Add Candidate") {
 				int idealPt = (Integer) PCE.getNewValue();
-				MODEL.addCandidate(idealPt);
+				model.addCandidate(idealPt);
 			} else if (PCE.getPropertyName() == "Set Budget") {
 				int budget = (Integer) PCE.getNewValue();
-				MODEL.setBudget(budget);
+				model.setBudget(budget);
 			} else if (PCE.getPropertyName() == "Set File Name") {
 				String fileName = (String) PCE.getNewValue();
-				MODEL.setFileName(fileName);
+				model.setFileName(fileName);
 			} else if (PCE.getPropertyName() == "Start Game") {
-				MODEL.setStartGame(true);
-				MODEL.startGame();
+				model.setStartGame(true);
+				model.startGame();
 				ServerHandler.notifyWaiters();
 				gui.setRound("First Buy");
 			} else if (PCE.getPropertyName() == "New Player") {
@@ -96,9 +102,9 @@ public class Server {
 				gui.setRound(newRound);
 			} else if (PCE.getPropertyName() == "Remove Player") {
 				int playerNumber = (Integer) PCE.getNewValue();
-				Player playerToRemove = MODEL.getPlayer(playerNumber);
+				Player playerToRemove = model.getPlayer(playerNumber);
 				if (playerToRemove != null) {
-					MODEL.removePlayer(playerToRemove);
+					model.removePlayer(playerToRemove);
 				}
 			}
 		}

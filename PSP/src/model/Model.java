@@ -10,7 +10,7 @@ public class Model {
 	private PropertyChangeSupport PCS;
 	private static int playerNumber;
 	private static int candidateNumber;
-	private static int budget = 4;
+	//private static int budget = 4;
 	private ArrayList<Candidate> candidates;
 	private ArrayList<Candidate> defaultCandidates;
 	private ArrayList<Candidate> inputCandidates;
@@ -20,25 +20,30 @@ public class Model {
 	private ArrayList<Player> players;
 	private boolean dataWritten = false;
 	private boolean startGame = true;
-	private int numCandidates = 4;
+	//private int numCandidates = 4;
 	private String fileName = "researchData.json";
-	private int[] graphData = new int[]{40, 5, 60, 5};
+	//private int[] graphData = new int[]{40, 5, 60, 5};
 	private int roundNum = 0;
 	private String[] roundNames = new String[]{"First Buy", "Straw Vote", "First Vote", "Second Buy", "Second Vote", "Over"};
-	private int numGames = 5;
+	//private int numGames = 5;
+	private int gameNum = 0;
+	private ArrayList<GameInfo> gameInfo;
 	
-	public Model(final PropertyChangeSupport PCS) {
+	public Model(final PropertyChangeSupport PCS, ArrayList<GameInfo> gameInfo) {
 		this.PCS = PCS;
+		this.gameInfo = gameInfo;
 		players = new ArrayList<Player>();
-		BiModalDist distribution = new BiModalDist(graphData);
+		setNewGame(gameInfo.get(0));
+	}
+	
+	public void setNewGame(GameInfo game) {
+		BiModalDist distribution = new BiModalDist(game.getDistribution());
 		points = distribution.getData();
 		sumPoints = distribution.getSumData();
 		sumDataPoints = distribution.getSum();
-		candidates = new ArrayList<Candidate>();
-		defaultCandidates = new ArrayList<Candidate>();
-		inputCandidates = null;
-		for (int i = 0; i < numCandidates; i++) {
-			defaultCandidates.add(newCandidate());
+		int[] currentCands = game.getIdealPts();
+		for (int i = 0; i < currentCands.length; i++) {
+			// FIXME add cand to candidates list with currentCand num
 		}
 	}
 	
