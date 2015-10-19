@@ -10,7 +10,7 @@ public class Model {
 	private PropertyChangeSupport PCS;
 	private static int playerNumber;
 	private static int candidateNumber;
-	private static int budget = 4;
+	//private static int budget = 4;
 	private ArrayList<Candidate> candidates;
 	private ArrayList<Candidate> defaultCandidates;
 	private ArrayList<Candidate> inputCandidates;
@@ -20,51 +20,60 @@ public class Model {
 	private ArrayList<Player> players;
 	private boolean dataWritten = false;
 	private boolean startGame = true;
-	private int numCandidates = 4;
+	//private int numCandidates = 4;
 	private String fileName = "researchData.json";
-	private int[] graphData = new int[]{40, 5, 60, 5};
+	//private int[] graphData = new int[]{40, 5, 60, 5};
 	private int roundNum = 0;
 	private String[] roundNames = new String[]{"First Buy", "Straw Vote", "First Vote", "Second Buy", "Second Vote", "Over"};
-	private int numGames = 5;
+	//private int numGames = 5;
+	private int gameNum = 0;
+	private ArrayList<GameInfo> gameInfo;
 	
-	public Model(final PropertyChangeSupport PCS) {
+	public Model(final PropertyChangeSupport PCS, ArrayList<GameInfo> gameInfo) {
 		this.PCS = PCS;
+		this.gameInfo = gameInfo;
 		players = new ArrayList<Player>();
-		BiModalDist distribution = new BiModalDist(graphData);
-		points = distribution.getData();
-		sumPoints = distribution.getSumData();
-		sumDataPoints = distribution.getSum();
+		setNewGame(gameInfo.get(0));
+	}
+	
+	public synchronized void getNewGame(int gameNum) {
+		if (this.gameNum < gameNum) {
+			this.gameNum++;
+		}
+	}
+	
+	public void setNewGame(GameInfo game) {
+		setGraphData(game.getDistribution());
+		int[] currentCands = game.getIdealPts();
 		candidates = new ArrayList<Candidate>();
-		defaultCandidates = new ArrayList<Candidate>();
-		inputCandidates = null;
-		for (int i = 0; i < numCandidates; i++) {
-			defaultCandidates.add(newCandidate());
+		for (int i = 0; i < currentCands.length; i++) {
+			Candidate candidate = new Candidate(i+1, getParty(), currentCands[i]);
+			candidates.add(candidate);
 		}
 	}
 	
 	public void setGraphData(int[] graphData) {
-		this.graphData = graphData;
 		BiModalDist distribution = new BiModalDist(graphData);
 		points = distribution.getData();
 		sumPoints = distribution.getSumData();
 		sumDataPoints = distribution.getSum();
 	}
 	
-	public void setNumCandidates(int numCandidates) {
-		candidateNumber = 0;
-		this.numCandidates = numCandidates;
-		candidates = new ArrayList<Candidate>();
-		for (int i = 0; i < numCandidates; i++) {
-			candidates.add(newCandidate());
-		}
-	}
+//	public void setNumCandidates(int numCandidates) {
+//		candidateNumber = 0;
+//		this.numCandidates = numCandidates;
+//		candidates = new ArrayList<Candidate>();
+//		for (int i = 0; i < numCandidates; i++) {
+//			candidates.add(newCandidate());
+//		}
+//	}
 	
-	public void setBudget(int budget) {
-		Model.budget = budget;
-	}
+//	public void setBudget(int budget) {
+//		Model.budget = budget;
+//	}
 	
 	public int getBudget() {
-		return Model.budget;
+		return gameInfo.get(gameNum).getBudget();
 	}
 	
 	public void setFileName(String fileName) {
@@ -80,7 +89,7 @@ public class Model {
 	}
 	
 	public int[] getData() {
-		return graphData;
+		return gameInfo.get(gameNum).getDistribution();
 	}
 
 	public Candidate newCandidate() {
@@ -123,7 +132,7 @@ public class Model {
 		int playerNum = getPlayerNumber();
 		char party = getParty();
 		int idealPt = getIdealPt();
-		Player player = new Player(playerNum, party, idealPt, budget, numCandidates);
+		Player player = new Player(playerNum, party, idealPt, getBudget(), candidates.size());
 		players.add(player);
 		PCS.firePropertyChange("New Player", null, playerNum);
 		return player;
@@ -202,7 +211,7 @@ public class Model {
 				}
 			}
 		});
-		return tempCands.get(numCandidates-1);
+		return tempCands.get(candidates.size()-1);
 	}
 	
 	public boolean winnerIsClosest(int playerIdeal, Candidate candidate) {
@@ -232,7 +241,7 @@ public class Model {
 	}
 	
 	public int getNumGames() {
-		return numGames;
+		return gameInfo.size();
 	}
 	
 	public synchronized void writeDataOut() {

@@ -53,7 +53,7 @@ public class ServerHandler {
 						model.writeDataOut(); 
 						gameNum++;
 						if (gameNum < model.getNumGames()) {
-							model.setNumCandidates(4);
+							model.getNewGame(gameNum);
 							removePlayer(); // FIXME change this in the future
 							player = model.newPlayer();
 							startGame();

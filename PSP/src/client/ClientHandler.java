@@ -83,6 +83,7 @@ public class ClientHandler {
 						gui.increaseWinnings();
 					}
 					gui.setTextPane("The winner is: " + winningCandidate);
+					sleep();
 				} else {
 					// Read the rest and ignore
 				}
@@ -165,6 +166,15 @@ public class ClientHandler {
 			gui.updateGUI();
 		} catch (IOException e) {
 			// Alert that it couldn't retrieve the player data
+		}
+	}
+	
+	private void sleep() {
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			// FIXME Do some sort of catch
+			e.printStackTrace();
 		}
 	}
 
