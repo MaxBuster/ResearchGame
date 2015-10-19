@@ -85,7 +85,6 @@ public class Server {
 				model.addCandidate(idealPt);
 			} else if (PCE.getPropertyName() == "Set Budget") {
 				int budget = (Integer) PCE.getNewValue();
-				model.setBudget(budget);
 			} else if (PCE.getPropertyName() == "Set File Name") {
 				String fileName = (String) PCE.getNewValue();
 				model.setFileName(fileName);

@@ -36,40 +36,44 @@ public class Model {
 		setNewGame(gameInfo.get(0));
 	}
 	
+	public synchronized void getNewGame(int gameNum) {
+		if (this.gameNum < gameNum) {
+			this.gameNum++;
+		}
+	}
+	
 	public void setNewGame(GameInfo game) {
-		BiModalDist distribution = new BiModalDist(game.getDistribution());
-		points = distribution.getData();
-		sumPoints = distribution.getSumData();
-		sumDataPoints = distribution.getSum();
+		setGraphData(game.getDistribution());
 		int[] currentCands = game.getIdealPts();
+		candidates = new ArrayList<Candidate>();
 		for (int i = 0; i < currentCands.length; i++) {
-			// FIXME add cand to candidates list with currentCand num
+			Candidate candidate = new Candidate(i+1, getParty(), currentCands[i]);
+			candidates.add(candidate);
 		}
 	}
 	
 	public void setGraphData(int[] graphData) {
-		this.graphData = graphData;
 		BiModalDist distribution = new BiModalDist(graphData);
 		points = distribution.getData();
 		sumPoints = distribution.getSumData();
 		sumDataPoints = distribution.getSum();
 	}
 	
-	public void setNumCandidates(int numCandidates) {
-		candidateNumber = 0;
-		this.numCandidates = numCandidates;
-		candidates = new ArrayList<Candidate>();
-		for (int i = 0; i < numCandidates; i++) {
-			candidates.add(newCandidate());
-		}
-	}
+//	public void setNumCandidates(int numCandidates) {
+//		candidateNumber = 0;
+//		this.numCandidates = numCandidates;
+//		candidates = new ArrayList<Candidate>();
+//		for (int i = 0; i < numCandidates; i++) {
+//			candidates.add(newCandidate());
+//		}
+//	}
 	
-	public void setBudget(int budget) {
-		Model.budget = budget;
-	}
+//	public void setBudget(int budget) {
+//		Model.budget = budget;
+//	}
 	
 	public int getBudget() {
-		return Model.budget;
+		return gameInfo.get(gameNum).getBudget();
 	}
 	
 	public void setFileName(String fileName) {
@@ -85,7 +89,7 @@ public class Model {
 	}
 	
 	public int[] getData() {
-		return graphData;
+		return gameInfo.get(gameNum).getDistribution();
 	}
 
 	public Candidate newCandidate() {
@@ -128,7 +132,7 @@ public class Model {
 		int playerNum = getPlayerNumber();
 		char party = getParty();
 		int idealPt = getIdealPt();
-		Player player = new Player(playerNum, party, idealPt, budget, numCandidates);
+		Player player = new Player(playerNum, party, idealPt, getBudget(), candidates.size());
 		players.add(player);
 		PCS.firePropertyChange("New Player", null, playerNum);
 		return player;
@@ -207,7 +211,7 @@ public class Model {
 				}
 			}
 		});
-		return tempCands.get(numCandidates-1);
+		return tempCands.get(candidates.size()-1);
 	}
 	
 	public boolean winnerIsClosest(int playerIdeal, Candidate candidate) {
@@ -237,7 +241,7 @@ public class Model {
 	}
 	
 	public int getNumGames() {
-		return numGames;
+		return gameInfo.size();
 	}
 	
 	public synchronized void writeDataOut() {

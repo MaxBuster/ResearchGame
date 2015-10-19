@@ -160,7 +160,7 @@ public class ClientJFrame extends JFrame {
 		Dimension d = new Dimension(5, 5);
 		table1.setPreferredScrollableViewportSize(d);
 		scrollPane1 = new JScrollPane(table1);
-		contentPane.add(scrollPane1, "cell 1 3 5 1,grow");
+		contentPane.add(scrollPane1, "cell 1 3 5 1");
 	}
 	
 	public void setScrollPane2(String[] columnNames, Object[][] data, String buttonColumn) {
@@ -173,7 +173,7 @@ public class ClientJFrame extends JFrame {
 		Dimension d = new Dimension(5, 5);
 		table2.setPreferredScrollableViewportSize(d);
 		scrollPane2 = new JScrollPane(table2);
-		contentPane.add(scrollPane2, "cell 1 4 5 1,grow");
+		contentPane.add(scrollPane2, "cell 1 4 5 1");
 	}
 
 	public void addEndRoundBtn(final int roundNum) {
