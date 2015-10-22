@@ -28,7 +28,6 @@ public class MakeChart extends ApplicationFrame {
 		chart = createChart(dataset);
 		XYPlot plot = (XYPlot) chart.getPlot();
 		plot.getDomainAxis().setRange(0.00, 100);
-		plot.getRangeAxis().setRange(0.00, 2.00);
 		final ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setPreferredSize(new java.awt.Dimension(500, 270));
 		setContentPane(chartPanel);
@@ -41,6 +40,7 @@ public class MakeChart extends ApplicationFrame {
 	public static IntervalXYDataset createDataset(double[] beta, String dataName) {
 		final XYSeries series = new XYSeries(dataName);
 		for (int i = 0; i < beta.length; i++) {
+//			series.add((double)i/100, beta[i]);
 			series.add(i, beta[i]);
 		}
 		final XYSeriesCollection dataset = new XYSeriesCollection(series);

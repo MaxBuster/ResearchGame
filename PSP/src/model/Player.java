@@ -23,6 +23,16 @@ public class Player {
 		this.info = new int[numCandidates][2];
 		this.votes = new int[3];
 	}
+	
+	public void resetPlayer(char playerParty, int idealPt, int budget, int numCandidates) {
+		this.playerParty = playerParty;
+		this.idealPt = idealPt;
+		this.budget = budget;
+		this.round = "straw";
+		this.doneWithRound = false;
+		this.info = new int[numCandidates][2];
+		this.votes = new int[3];
+	}
 
 	public int getPlayerNumber() {
 		return playerNum;

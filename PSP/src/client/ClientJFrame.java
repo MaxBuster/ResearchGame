@@ -36,6 +36,8 @@ import org.jfree.chart.LegendItem;
 import org.jfree.chart.plot.ValueMarker;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.IntervalXYDataset;
+import org.jfree.ui.RectangleAnchor;
+import org.jfree.ui.TextAnchor;
 
 public class ClientJFrame extends JFrame {
 	private PropertyChangeSupport PCS;
@@ -55,7 +57,7 @@ public class ClientJFrame extends JFrame {
 
 	private JScrollPane scrollPane2;
 	private JTable table2;
-	
+
 	private MakeChart chart;
 	private JFreeChart graph;
 	private ChartPanel pane;
@@ -70,7 +72,7 @@ public class ClientJFrame extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new MigLayout("", "[grow,right][50px,grow,fill][50px,grow,fill][50px,grow,fill][50px,grow,fill][50px,grow,fill][grow,left]", "[grow,top][fill][fill][100px,grow,fill][100px,grow,fill][grow,fill][grow][][grow,bottom]"));
+		contentPane.setLayout(new MigLayout("", "[grow,right][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,left]", "[grow,top][fill][fill][100px,grow,fill][100px,grow,fill][grow,fill][grow][][grow,bottom]"));
 		genericTextPane = new JTextPane();
 		contentPane.add(genericTextPane, "cell 1 2 5 1,grow");
 		String startingMessage = "Please wait for the game to begin";
@@ -111,7 +113,7 @@ public class ClientJFrame extends JFrame {
 
 		lblIdealPoint.setText("Ideal Point: " + idealPt);
 		lblIdealPoint.setVisible(true);
-		
+
 		lblBudget.setText("Budget: " + budget);
 		lblBudget.setVisible(true);
 		this.budget = budget;
@@ -129,49 +131,46 @@ public class ClientJFrame extends JFrame {
 	public void addChart(double[] chartData, int idealPoint) {
 		chart = new MakeChart("Distribution of Voters", chartData);
 		graph = chart.getChart();
-		
-		ValueMarker marker = new ValueMarker(idealPoint);  
+
+		ValueMarker marker = new ValueMarker(idealPoint);
 		marker.setPaint(Color.black);
-		marker.setLabel("Ideal Pt");
+		marker.setLabel("You");
+        marker.setLabelTextAnchor(TextAnchor.TOP_RIGHT);
 		graph.getXYPlot().addDomainMarker(marker);
-		
+
 		pane.setChart(graph);
 		pane.setVisible(true);
 	}
-	
+
 	public void addDataset(int candidate, IntervalXYDataset data) {
 		graph.getXYPlot().setDataset(candidate+1, data);
-		
+
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(); 
 		renderer.setSeriesShapesVisible(0, false);
-		Color[] colors = new Color[]{Color.blue, Color.yellow, Color.green, Color.orange};
+		Color[] colors = new Color[]{Color.blue, Color.green, Color.cyan, Color.orange, Color.magenta};
 		renderer.setSeriesPaint(0, colors[candidate]);
 		graph.getXYPlot().setRenderer(candidate+1, renderer); 
 	}
-	
+
 	public void updateGUI() {
 		contentPane.revalidate();
 		contentPane.repaint();
 	}
-	
+
 	public void setScrollPane1(String[] columnNames, Object[][] data) {
 		DefaultTableModel table1Model = new DefaultTableModel(data, columnNames);
 		table1 = new JTable(table1Model);
-		Dimension d = new Dimension(5, 5);
-		table1.setPreferredScrollableViewportSize(d);
 		scrollPane1 = new JScrollPane(table1);
 		contentPane.add(scrollPane1, "cell 1 3 5 1");
 	}
-	
+
 	public void setScrollPane2(String[] columnNames, Object[][] data, String buttonColumn) {
 		DefaultTableModel table2Model = new DefaultTableModel(data, columnNames);
 		table2 = new JTable(table2Model);
-		
+
 		table2.getColumn(buttonColumn).setCellRenderer(new ButtonRenderer());
 		table2.getColumn(buttonColumn).setCellEditor(new ButtonEditor(new JCheckBox()));
-		
-		Dimension d = new Dimension(5, 5);
-		table2.setPreferredScrollableViewportSize(d);
+
 		scrollPane2 = new JScrollPane(table2);
 		contentPane.add(scrollPane2, "cell 1 4 5 1");
 	}
@@ -181,21 +180,22 @@ public class ClientJFrame extends JFrame {
 		btnEndRound.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				btnEndRound.setVisible(false);
-				contentPane.remove(scrollPane2);
+				removeScrollPane2();
+				contentPane.remove(btnEndRound);
 				PCS.firePropertyChange("End Round", roundNum, null); // Sends which buy round ended
 			}
 		});
-		contentPane.add(btnEndRound, "cell 5 6");
+		contentPane.add(btnEndRound, "cell 5 6"); 
 	}
-	
+
 	public void removeScrollPane1() {
 		contentPane.remove(scrollPane1);
 	}
-	
+
 	public void removeScrollPane2() {
 		contentPane.remove(scrollPane2);
 	}
-	
+
 	public void increaseWinnings() {
 		winnings++;
 		lblWinnings.setText("Winnings: " + winnings);
@@ -258,6 +258,7 @@ public class ClientJFrame extends JFrame {
 				budget -= price;
 				lblBudget.setText("Budget: " + budget);
 			} else {
+				System.out.println("Not enough money");
 				// Open dialog - not enough money
 			}
 		}
@@ -293,11 +294,6 @@ public class ClientJFrame extends JFrame {
 				@Override
 				public void run() {
 					if (isPushed) {
-//						int selectedRow = table2.getSelectedRow();
-//						System.out.println("Selected row is: " + selectedRow);
-//						((DefaultTableModel) table2.getModel()).removeRow(selectedRow);
-//						table2.revalidate();
-//						table2.repaint();
 						isPushed = false;
 					}
 				}

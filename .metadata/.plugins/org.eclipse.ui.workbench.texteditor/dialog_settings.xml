@@ -3,26 +3,26 @@
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
 		<item value="309" key="DIALOG_WIDTH"/>
 		<item value="47" key="DIALOG_Y_ORIGIN"/>
+		<item value="467" key="DIALOG_HEIGHT"/>
 		<item value="972" key="DIALOG_X_ORIGIN"/>
-		<item value="439" key="DIALOG_HEIGHT"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="true" key="wrap"/>
-		<item value="false" key="casesensitive"/>
 		<item value="false" key="isRegEx"/>
+		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="false" key="wholeword"/>
-		<item value="Selected row" key="selection"/>
+		<item value="getBeta" key="selection"/>
 		<list key="findhistory">
+			<item value="getBeta"/>
+			<item value="&lt;&lt;"/>
+			<item value="cell 5 1"/>
+			<item value="add(lblWinnings"/>
+			<item value="addDa"/>
+			<item value="getD"/>
 			<item value="selected row"/>
 			<item value="fire"/>
-			<item value=".add"/>
-			<item value="addTo"/>
-			<item value="addToT"/>
-			<item value="budget"/>
-			<item value="infoPrice"/>
-			<item value="PCS"/>
 		</list>
 		<list key="replacehistory">
 		</list>

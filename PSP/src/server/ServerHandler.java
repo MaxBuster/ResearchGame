@@ -54,8 +54,7 @@ public class ServerHandler {
 						gameNum++;
 						if (gameNum < model.getNumGames()) {
 							model.getNewGame(gameNum);
-							removePlayer(); // FIXME change this in the future
-							player = model.newPlayer();
+							model.resetPlayer(player);
 							startGame();
 						}
 					}

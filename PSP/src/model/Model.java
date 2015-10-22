@@ -10,22 +10,17 @@ public class Model {
 	private PropertyChangeSupport PCS;
 	private static int playerNumber;
 	private static int candidateNumber;
-	//private static int budget = 4;
 	private ArrayList<Candidate> candidates;
 	private ArrayList<Candidate> defaultCandidates;
 	private ArrayList<Candidate> inputCandidates;
-	private int[] points;
 	private int[] sumPoints;
 	private int sumDataPoints;
 	private ArrayList<Player> players;
 	private boolean dataWritten = false;
 	private boolean startGame = true;
-	//private int numCandidates = 4;
 	private String fileName = "researchData.json";
-	//private int[] graphData = new int[]{40, 5, 60, 5};
 	private int roundNum = 0;
 	private String[] roundNames = new String[]{"First Buy", "Straw Vote", "First Vote", "Second Buy", "Second Vote", "Over"};
-	//private int numGames = 5;
 	private int gameNum = 0;
 	private ArrayList<GameInfo> gameInfo;
 	
@@ -39,6 +34,7 @@ public class Model {
 	public synchronized void getNewGame(int gameNum) {
 		if (this.gameNum < gameNum) {
 			this.gameNum++;
+			setNewGame(gameInfo.get(gameNum));
 		}
 	}
 	
@@ -53,24 +49,10 @@ public class Model {
 	}
 	
 	public void setGraphData(int[] graphData) {
-		BiModalDist distribution = new BiModalDist(graphData);
-		points = distribution.getData();
+		GetDistribution distribution = new GetDistribution(graphData);
 		sumPoints = distribution.getSumData();
 		sumDataPoints = distribution.getSum();
 	}
-	
-//	public void setNumCandidates(int numCandidates) {
-//		candidateNumber = 0;
-//		this.numCandidates = numCandidates;
-//		candidates = new ArrayList<Candidate>();
-//		for (int i = 0; i < numCandidates; i++) {
-//			candidates.add(newCandidate());
-//		}
-//	}
-	
-//	public void setBudget(int budget) {
-//		Model.budget = budget;
-//	}
 	
 	public int getBudget() {
 		return gameInfo.get(gameNum).getBudget();
@@ -136,6 +118,12 @@ public class Model {
 		players.add(player);
 		PCS.firePropertyChange("New Player", null, playerNum);
 		return player;
+	}
+	
+	public void resetPlayer(Player player) {
+		char party = getParty();
+		int idealPt = getIdealPt();
+		player.resetPlayer(party, idealPt, getBudget(), candidates.size());
 	}
 	
 	public void removePlayer(Player player) {

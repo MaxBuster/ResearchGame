@@ -111,7 +111,7 @@ public class ClientHandler {
 			for (int i = 0; i < 4; i++) {
 				chartInfo[i] = socketInputStream.readInt();
 			}
-			double[] chartData = ClientBiModalDist.getData(chartInfo);
+			double[] chartData = BiModalDist.getData(chartInfo);
 			gui.addChart(chartData, idealPt);
 		} catch (IOException e) {
 			// Alert that it couldn't retrieve the player data
@@ -136,7 +136,7 @@ public class ClientHandler {
 					infoPrice = 1;
 				}
 				double[] candidateExpectations  = BetaDist.getBetaDist(0, 0);
-				for (int candidate = 0; candidate < 4; candidate++) {
+				for (int candidate = 0; candidate < numCandidates; candidate++) {
 					IntervalXYDataset dataset = MakeChart.createDataset(candidateExpectations, "Candidate " + (candidate+1));
 					gui.addDataset(candidate, dataset);
 				}
@@ -208,7 +208,7 @@ public class ClientHandler {
 				gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
 				gui.updateGUI();
 			} else if (round == 1) {
-				Object[][] TempTable2BuyData = new Object[2][]; // FIXME this is hardcoded
+				Object[][] TempTable2BuyData = new Object[2][]; 
 				Object[][] TempTable2VoteData = new Object[2][];
 				TempTable2BuyData[0] = TABLE2BUYDATA[candNums[numCandidates-1]-1];
 				TempTable2VoteData[0] = TABLE2VOTEDATA[candNums[numCandidates-1]-1];
@@ -219,7 +219,6 @@ public class ClientHandler {
 
 				String secondBuyDescription = "This is the final information purchase round.";
 				gui.setTextPane(secondBuyDescription);
-				gui.removeScrollPane1();
 				gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
 				gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
 				gui.addEndRoundBtn(0);

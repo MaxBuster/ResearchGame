@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 import org.jfree.data.xy.IntervalXYDataset;
 
-import model.BiModalDist;
+import model.GetDistribution;
 import model.GameInfo;
 import model.Model;
 import model.Player;
