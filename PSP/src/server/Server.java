@@ -49,6 +49,7 @@ public class Server {
 				newThread(clientSocket);
 			}
 		} catch (IOException e) {
+			e.printStackTrace();
 			// Throw error
 		}
 	}
@@ -65,8 +66,10 @@ public class Server {
 							out);
 					serverHandler.handleIO();
 				} catch (EOFException e) {
+					e.printStackTrace();
 					// Throw error
 				} catch (IOException e) {
+					e.printStackTrace();
 					// Throw error
 				}
 			}
@@ -77,28 +80,10 @@ public class Server {
 	class ChangeListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent PCE) {
-			if (PCE.getPropertyName() == "Set Graph Data") {
-				int[] graphData = (int[]) PCE.getNewValue();
-				model.setGraphData(graphData);
-			} else if (PCE.getPropertyName() == "Add Candidate") {
-				int idealPt = (Integer) PCE.getNewValue();
-				model.addCandidate(idealPt);
-			} else if (PCE.getPropertyName() == "Set Budget") {
-				int budget = (Integer) PCE.getNewValue();
-			} else if (PCE.getPropertyName() == "Set File Name") {
-				String fileName = (String) PCE.getNewValue();
-				model.setFileName(fileName);
-			} else if (PCE.getPropertyName() == "Start Game") {
+			if (PCE.getPropertyName() == "Start Game") {
 				model.setStartGame(true);
-				model.startGame();
 				ServerHandler.notifyWaiters();
 				gui.setRound("First Buy");
-			} else if (PCE.getPropertyName() == "New Player") {
-				int playerNumber = (Integer) PCE.getNewValue();
-				gui.addRowToPlayers(playerNumber);
-			} else if (PCE.getPropertyName() == "New Round") {
-				String newRound = (String) PCE.getNewValue();
-				gui.setRound(newRound);
 			} else if (PCE.getPropertyName() == "Remove Player") {
 				int playerNumber = (Integer) PCE.getNewValue();
 				Player playerToRemove = model.getPlayer(playerNumber);

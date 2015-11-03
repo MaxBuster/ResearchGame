@@ -50,12 +50,15 @@ public class ServerHandler {
 						startSecondBuy();
 					} else {
 						sendWinner();
-						model.writeDataOut(); 
+						Player clone = new Player(player);
+						model.addPlayerToGameObject(clone, gameNum);
 						gameNum++;
 						if (gameNum < model.getNumGames()) {
 							model.getNewGame(gameNum);
 							model.resetPlayer(player);
 							startGame();
+						} else {
+							model.writeDataOut(); 
 						}
 					}
 				} else {

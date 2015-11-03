@@ -24,6 +24,15 @@ public class Player {
 		this.votes = new int[3];
 	}
 	
+	public Player(Player player) {
+		this.playerNum = player.getPlayerNumber();
+		this.playerParty = player.getParty();
+		this.idealPt = player.getIdealPt();
+		this.budget = player.getBudget();
+		this.info = player.getInfo();
+		this.votes = player.getVotes();
+	}
+	
 	public void resetPlayer(char playerParty, int idealPt, int budget, int numCandidates) {
 		this.playerParty = playerParty;
 		this.idealPt = idealPt;

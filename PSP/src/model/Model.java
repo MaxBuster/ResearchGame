@@ -11,8 +11,6 @@ public class Model {
 	private static int playerNumber;
 	private static int candidateNumber;
 	private ArrayList<Candidate> candidates;
-	private ArrayList<Candidate> defaultCandidates;
-	private ArrayList<Candidate> inputCandidates;
 	private int[] sumPoints;
 	private int sumDataPoints;
 	private ArrayList<Player> players;
@@ -29,6 +27,10 @@ public class Model {
 		this.gameInfo = gameInfo;
 		players = new ArrayList<Player>();
 		setNewGame(gameInfo.get(0));
+	}
+	
+	public synchronized void addPlayerToGameObject(Player player, int currentGame) {
+		gameInfo.get(currentGame).addPlayer(player);
 	}
 	
 	public synchronized void getNewGame(int gameNum) {
@@ -57,10 +59,6 @@ public class Model {
 	public int getBudget() {
 		return gameInfo.get(gameNum).getBudget();
 	}
-	
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
 
 	public boolean getStartGame() {
 		return startGame;
@@ -74,14 +72,6 @@ public class Model {
 		return gameInfo.get(gameNum).getDistribution();
 	}
 
-	public Candidate newCandidate() {
-		int candNum = getCandidateNumber();
-		char party = getParty();
-		int idealPt = getIdealPt();
-		Candidate candidate = new Candidate(candNum, party, idealPt);
-		return candidate;
-	}
-
 	public int getCandidateNumber() {
 		candidateNumber++;
 		return candidateNumber;
@@ -89,25 +79,6 @@ public class Model {
 
 	public ArrayList<Candidate> getCandidates() {
 		return candidates;
-	}
-	
-	public void startGame() {
-		if (inputCandidates == null) {
-			candidates = defaultCandidates;
-		} else {
-			candidates = inputCandidates;
-		}
-	}
-	
-	public void addCandidate(int idealPt) {
-		if (inputCandidates == null) {
-			inputCandidates = new ArrayList<Candidate>();
-			candidateNumber = 0;
-		}
-		char party = getParty();
-		int candNum = getCandidateNumber();
-		Candidate candidate = new Candidate(candNum, party, idealPt);
-		inputCandidates.add(candidate);
 	}
 
 	public synchronized Player newPlayer() {
@@ -235,8 +206,7 @@ public class Model {
 	public synchronized void writeDataOut() {
 		if (!dataWritten) {
 			dataWritten = true;
-			WriteDataOut.createPlayerString(players, fileName);
-			WriteDataOut.createCandidateString(candidates, fileName);
+			WriteDataOut.writeData(gameInfo);
 		}
 	}
 }

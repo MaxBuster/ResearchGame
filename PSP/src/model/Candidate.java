@@ -1,12 +1,9 @@
 package model;
 
 public class Candidate {
-	private static final int NOISE = 10;
 	private int candidateNumber;
 	private char party;
 	private int idealPt;
-	private int lowerBound;
-	private int upperBound;
 	private int strawVotes = 0;
 	private int firstRoundVotes = 0;
 	private int secondRoundVotes = 0;
@@ -15,26 +12,15 @@ public class Candidate {
 		this.candidateNumber = candidateNumber;
 		this.party = party;
 		this.idealPt = idealPt;
-		this.lowerBound = calcLowerBound(idealPt);
-		this.upperBound = calcUpperBound(idealPt);
 	}
-
-	public int calcLowerBound(int idealPt) {
-		idealPt -= NOISE;
-		if (idealPt < 0) {
-			return 0;
-		} else {
-			return idealPt;
-		}
-	}
-
-	public int calcUpperBound(int idealPt) {
-		idealPt += NOISE;
-		if (idealPt > 100) {
-			return 100;
-		} else {
-			return idealPt;
-		}
+	
+	public Candidate(Candidate candidate) {
+		this.candidateNumber = candidate.getCandidateNumber();
+		this.party = candidate.getParty();
+		this.idealPt = candidate.getIdealPt();
+		this.strawVotes = candidate.getStrawVotes();
+		this.firstRoundVotes = candidate.getFirstVotes();
+		this.secondRoundVotes = candidate.getSecondVotes();
 	}
 
 	public int getCandidateNumber() {
@@ -47,14 +33,6 @@ public class Candidate {
 
 	public int getIdealPt() {
 		return idealPt;
-	}
-
-	public int getLowerBound() {
-		return lowerBound;
-	}
-
-	public int getUpperBound() {
-		return upperBound;
 	}
 
 	public void voteStraw() {

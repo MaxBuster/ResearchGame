@@ -18,6 +18,7 @@ public class ReadConfig {
 				FileReader fReader = new FileReader(file);
 				BufferedReader bReader = new BufferedReader(fReader);
 				String line;
+				// Get first line = numgames
 				while ((line = bReader.readLine()) != null) {
 					// FIXME Check that the line is not blank
 					String[] candidates = line.split("[ ]*,[ ]*");
@@ -32,6 +33,7 @@ public class ReadConfig {
 						for (int i=0; i<distribution.length; i++) {
 							distributionNums[i] = Integer.parseInt(distribution[i]);
 						}
+						// FIXME get parties of cands too
 						if ((line = bReader.readLine()) != null) {
 							int budget = Integer.parseInt(line); // FIXME Catch errors thrown by this
 							GameInfo game = new GameInfo(candidateNums, distributionNums, budget);
