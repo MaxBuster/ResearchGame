@@ -78,6 +78,7 @@ public class ClientHandler {
 					gui.updateGUI();
 				} else if (messageType == 13) {
 					int winningCandidate = socketInputStream.readByte();
+					System.out.println("winner: " + winningCandidate);
 					boolean isClosest = socketInputStream.readBoolean();
 					if (isClosest) {
 						gui.increaseWinnings();

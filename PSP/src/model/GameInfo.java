@@ -1,14 +1,23 @@
 package model;
 
+import java.util.LinkedList;
+
 public class GameInfo {
+	private int gameNum;
 	private int[] idealPts;
 	private int[] distribution;
 	private int budget;
+	private LinkedList<Player> players = new LinkedList<Player>();
 	
-	public GameInfo(int[] idealPts, int[] distribution, int budget) {
+	public GameInfo(int gameNum, int[] idealPts, int[] distribution, int budget) {
+		this.gameNum = gameNum;
 		this.idealPts = idealPts;
 		this.distribution = distribution;
 		this.budget = budget;
+	}
+	
+	public int getGameNum() {
+		return gameNum;
 	}
 
 	public int[] getIdealPts() {
@@ -21,5 +30,13 @@ public class GameInfo {
 
 	public int getBudget() {
 		return budget;
+	}
+	
+	public synchronized void addPlayer(Player player) {
+		players.add(player);
+	}
+	
+	public LinkedList<Player> getPlayers() {
+		return players;
 	}
 }

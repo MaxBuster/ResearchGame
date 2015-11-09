@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring accessors="true" comment="Delete 3 elements from project &apos;PolySci&apos;&#x0A;- Original project: &apos;PolySci&apos;&#x0A;- Original elements:&#x0A;     PolySci/src/polysciproj.src.client&#x0A;     PolySci/src/polysciproj.src.model&#x0A;     PolySci/src/polysciproj.src.server" description="Delete elements" element1="/src&lt;polysciproj.src.server" element2="/src&lt;polysciproj.src" element3="/src&lt;polysciproj" element4="/src&lt;polysciproj.src.model" element5="/src&lt;polysciproj.src" element6="/src&lt;polysciproj" element7="/src&lt;polysciproj.src.client" element8="/src&lt;polysciproj.src" element9="/src&lt;polysciproj" elements="9" flags="589830" id="org.eclipse.jdt.ui.delete" resources="0" stamp="1431738205601" subPackages="false" version="1.0"/>
+</session>

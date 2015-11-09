@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="com.orsoncharts.util.json.JSONObject"/>
+<fullyQualifiedTypeName name="com.orsoncharts.util.json.JSONArray"/>
+<fullyQualifiedTypeName name="model.Candidate"/>
+<fullyQualifiedTypeName name="java.io.Writer"/>
+<fullyQualifiedTypeName name="java.io.BufferedWriter"/>
+<fullyQualifiedTypeName name="java.io.OutputStreamWriter"/>
+<fullyQualifiedTypeName name="java.io.FileOutputStream"/>
+<fullyQualifiedTypeName name="java.io.IOException"/>
+<fullyQualifiedTypeName name="java.util.Arrays"/>
+<fullyQualifiedTypeName name="java.util.Comparator"/>
+<fullyQualifiedTypeName name="java.beans.PropertyChangeSupport"/>
+<fullyQualifiedTypeName name="model.Player"/>
+<fullyQualifiedTypeName name="java.util.Collections"/>
+<fullyQualifiedTypeName name="org.jfree.chart.plot.ValueMarker"/>
+<fullyQualifiedTypeName name="java.awt.Color"/>
+<fullyQualifiedTypeName name="org.apache.commons.math3.distribution.BetaDistribution"/>
+<fullyQualifiedTypeName name="client.MakeChart"/>
+<fullyQualifiedTypeName name="org.jfree.chart.renderer.xy.XYLineAndShapeRenderer"/>
+<fullyQualifiedTypeName name="org.jfree.data.xy.IntervalXYDataset"/>
+<fullyQualifiedTypeName name="java.io.File"/>
+<fullyQualifiedTypeName name="java.io.FileReader"/>
+<fullyQualifiedTypeName name="java.io.BufferedReader"/>
+<fullyQualifiedTypeName name="model.ReadConfig"/>
+<fullyQualifiedTypeName name="java.util.ArrayList"/>
+<fullyQualifiedTypeName name="org.jfree.ui.RectangleAnchor"/>
+<fullyQualifiedTypeName name="org.jfree.ui.TextAnchor"/>
+</qualifiedTypeNameHistroy>

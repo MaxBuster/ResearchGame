@@ -52,9 +52,10 @@ public class ServerJFrame extends JFrame {
 		startGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				PCS.firePropertyChange("Start Game", null, true);
+				startGame.setVisible(false);
 			}
 		});
-		contentPane.add(startGame, "cell 1 7");
+		contentPane.add(startGame, "cell 3 2");
 		
 		addScrollPane();
 	}

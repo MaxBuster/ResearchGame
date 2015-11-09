@@ -50,12 +50,15 @@ public class ServerHandler {
 						startSecondBuy();
 					} else {
 						sendWinner();
-						model.writeDataOut(); 
+						Player clone = new Player(player);
+						model.addPlayerToGameObject(clone, gameNum);
 						gameNum++;
 						if (gameNum < model.getNumGames()) {
 							model.getNewGame(gameNum);
 							model.resetPlayer(player);
 							startGame();
+						} else {
+							model.writeDataOut(); 
 						}
 					}
 				} else {
@@ -234,6 +237,7 @@ public class ServerHandler {
 	
 	private void sendWinner() {
 		Candidate winner = model.getWinner();
+		System.out.println("winner: " + winner.getCandidateNumber());
 		writeMessage(13, winner.getCandidateNumber()); // Writes out the winner
 		boolean isClosest = model.winnerIsClosest(player.getIdealPt(), winner);
 		try {
