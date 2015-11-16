@@ -11,6 +11,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import org.jfree.data.xy.IntervalXYDataset;
 
 import model.GetDistribution;
@@ -28,17 +30,18 @@ public class Server {
 	public Server() {
 		ArrayList<GameInfo> gameInfo = ReadConfig.readFile();
 		this.model = new Model(PCS, gameInfo);
-		
+
 		try {
 			serverSocket = new ServerSocket(10501);
+			PCS.addPropertyChangeListener(new ChangeListener());
+
+			//model.setStartGame(false); 
+			gui = new ServerJFrame(PCS, model.getNumGames());
+			gui.setVisible(true);
 		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Problem opening server");
 			e.printStackTrace();
 		}
-		PCS.addPropertyChangeListener(new ChangeListener());
-		
-		// model.setStartGame(false); FIXME change this back in the future
-		gui = new ServerJFrame(PCS);
-		gui.setVisible(true);
 	}
 
 	public void run() {
@@ -76,7 +79,7 @@ public class Server {
 		};
 		thread.start();
 	}
-	
+
 	class ChangeListener implements PropertyChangeListener {
 		@Override
 		public void propertyChange(PropertyChangeEvent PCE) {
@@ -84,18 +87,24 @@ public class Server {
 				model.setStartGame(true);
 				ServerHandler.notifyWaiters();
 				gui.setRound("First Buy");
-			} else if (PCE.getPropertyName() == "Remove Player") {
+			} else if (PCE.getPropertyName() == "Remove Player") { // Gui removed player
 				int playerNumber = (Integer) PCE.getNewValue();
 				Player playerToRemove = model.getPlayer(playerNumber);
 				if (playerToRemove != null) {
 					model.removePlayer(playerToRemove);
 				}
+			} else if (PCE.getPropertyName() == "Removed Player") { // Problem occured, player removed
+				int playerNumber = (Integer) PCE.getNewValue();
+				gui.removePlayer(playerNumber);
 			} else if (PCE.getPropertyName() == "New Player") {
 				int playerNumber = (Integer) PCE.getNewValue();
 				gui.addRowToPlayers(playerNumber);
 			}  else if (PCE.getPropertyName() == "New Round") {
 				String roundName = (String) PCE.getNewValue();
 				gui.setRound(roundName);
+			}  else if (PCE.getPropertyName() == "New Game") {
+				int gameNum = (Integer) PCE.getNewValue();
+				gui.setGame(gameNum+1);
 			}
 		}
 	}

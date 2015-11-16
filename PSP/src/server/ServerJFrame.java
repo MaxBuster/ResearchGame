@@ -28,16 +28,19 @@ import javax.swing.UIManager;
 
 public class ServerJFrame extends JFrame {
 	private PropertyChangeSupport PCS;
+	private int numGames;
 	private JPanel contentPane;
 	private JLabel roundLabel;
+	private JLabel gameLabel;
 	private JButton startGame;
 	private JTable table;
 	private JScrollPane scrollPane;
 	private String[] columnNames = new String[]{"Player #", "Remove"};
 	private Object[][] data = new Object[0][2];
 
-	public ServerJFrame(final PropertyChangeSupport PCS) {
+	public ServerJFrame(final PropertyChangeSupport PCS, int numGames) {
 		this.PCS = PCS;
+		this.numGames = numGames;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 600, 600);
 		contentPane = new JPanel();
@@ -47,6 +50,9 @@ public class ServerJFrame extends JFrame {
 
 		roundLabel = new JLabel("Game not started yet");
 		contentPane.add(roundLabel, "cell 3 1");
+		
+		gameLabel = new JLabel("Game: 1/" + numGames);
+		contentPane.add(gameLabel, "cell 4 1");
 		
 		startGame = new JButton("Start Game");
 		startGame.addActionListener(new ActionListener() {
@@ -87,6 +93,21 @@ public class ServerJFrame extends JFrame {
 	
 	public void setRound(String round) {
 		roundLabel.setText("Round: " + round);
+	}
+	
+	public void setGame(int gameNum) {
+		gameLabel.setText("Game: " + gameNum + "/" + numGames);
+	}
+	
+	public void removePlayer(int playerNumber) {
+		for (int i=0; i<table.getModel().getRowCount(); i++) {
+			int rowPlayerNumber = (Integer) table.getModel().getValueAt(i, 0);
+			if (rowPlayerNumber == playerNumber) {
+				((DefaultTableModel) table.getModel()).removeRow(i);
+				table.revalidate();
+				table.repaint();
+			}
+		}
 	}
 	
 	public void updateGUI() {

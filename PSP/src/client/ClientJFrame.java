@@ -61,6 +61,8 @@ public class ClientJFrame extends JFrame {
 	private MakeChart chart;
 	private JFreeChart graph;
 	private ChartPanel pane;
+	
+	private static final String WAITING_MESSAGE = "We are waiting for everyone to finish this round.";
 
 	/**
 	 * Create the frame.
@@ -146,8 +148,10 @@ public class ClientJFrame extends JFrame {
 		graph.getXYPlot().setDataset(candidate+1, data);
 
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(); 
+		
 		renderer.setSeriesShapesVisible(0, false);
-		Color[] colors = new Color[]{Color.blue, Color.green, Color.cyan, Color.orange, Color.magenta};
+		Color[] colors = new Color[]{new Color(0, 0 ,153), new Color(0, 153, 0), new Color(255, 102, 0), 
+									new Color(255, 255, 0), new Color(153, 0, 153), new Color(255,0,204)};
 		renderer.setSeriesPaint(0, colors[candidate]);
 		graph.getXYPlot().setRenderer(candidate+1, renderer); 
 	}
@@ -183,6 +187,7 @@ public class ClientJFrame extends JFrame {
 				removeScrollPane2();
 				contentPane.remove(btnEndRound);
 				PCS.firePropertyChange("End Round", roundNum, null); // Sends which buy round ended
+				setTextPane(WAITING_MESSAGE);
 			}
 		});
 		contentPane.add(btnEndRound, "cell 5 6"); 
@@ -198,8 +203,13 @@ public class ClientJFrame extends JFrame {
 
 	public void increaseWinnings() {
 		winnings++;
+		winnings += budget;
 		lblWinnings.setText("Winnings: " + winnings);
 		updateGUI();
+	}
+	
+	public int getWinnings() {
+		return winnings;
 	}
 
 	class ButtonRenderer extends JButton implements TableCellRenderer {
@@ -239,12 +249,12 @@ public class ClientJFrame extends JFrame {
 			button.setOpaque(true);
 			button.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					if (label == "Buy") {
+					if (label.equals("Buy")) {
 						fireBuy();
-					} else if (label == "Vote") {
+					} else if (label.equals("Vote")) {
 						fireVote();
 					}
-					//fireEditingStopped();
+					fireEditingStopped();
 				}
 			});
 		}
@@ -258,15 +268,14 @@ public class ClientJFrame extends JFrame {
 				budget -= price;
 				lblBudget.setText("Budget: " + budget);
 			} else {
-				System.out.println("Not enough money");
-				// Open dialog - not enough money
+				JOptionPane.showMessageDialog(null, "You don't have enough money to buy that info.");
 			}
 		}
 
 		public void fireVote() {
-			isPushed = false;
 			int selectedRow = table2.getSelectedRow();
 			int selectedCand = (Integer) table2.getModel().getValueAt(selectedRow, 0) - 1;
+			setTextPane(WAITING_MESSAGE);
 			contentPane.remove(scrollPane2);
 			contentPane.remove(scrollPane1);
 			contentPane.revalidate();

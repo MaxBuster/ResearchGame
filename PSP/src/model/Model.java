@@ -10,13 +10,11 @@ public class Model {
 	private PropertyChangeSupport PCS;
 	private static int playerNumber;
 	private static int candidateNumber;
-	private ArrayList<Candidate> candidates;
 	private int[] sumPoints;
 	private int sumDataPoints;
 	private ArrayList<Player> players;
 	private boolean dataWritten = false;
 	private boolean startGame = true;
-	private String fileName = "researchData.json";
 	private int roundNum = 0;
 	private String[] roundNames = new String[]{"First Buy", "Straw Vote", "First Vote", "Second Buy", "Second Vote", "Over"};
 	private int gameNum = 0;
@@ -35,19 +33,23 @@ public class Model {
 	
 	public synchronized void getNewGame(int gameNum) {
 		if (this.gameNum < gameNum) {
+			PCS.firePropertyChange("New Round", null, roundNames[0]);
+			PCS.firePropertyChange("New Game", null, gameNum);
 			this.gameNum++;
 			setNewGame(gameInfo.get(gameNum));
 		}
 	}
 	
-	public void setNewGame(GameInfo game) {
+	public void setNewGame(GameInfo game) { 
 		setGraphData(game.getDistribution());
-		int[] currentCands = game.getIdealPts();
-		candidates = new ArrayList<Candidate>();
-		for (int i = 0; i < currentCands.length; i++) {
-			Candidate candidate = new Candidate(i+1, getParty(), currentCands[i]);
+		int[] candIdealPts = game.getIdealPts();
+		char[] candParties = game.getParties();
+		ArrayList<Candidate> candidates = new ArrayList<Candidate>();
+		for (int i = 0; i < candIdealPts.length; i++) {
+			Candidate candidate = new Candidate(i+1, candParties[i], candIdealPts[i]);
 			candidates.add(candidate);
 		}
+		gameInfo.get(gameNum).setCandidates(candidates);
 	}
 	
 	public void setGraphData(int[] graphData) {
@@ -60,11 +62,11 @@ public class Model {
 		return gameInfo.get(gameNum).getBudget();
 	}
 
-	public boolean getStartGame() {
+	public synchronized boolean getStartGame() {
 		return startGame;
 	}
 	
-	public void setStartGame(boolean newStartGame) {
+	public synchronized void setStartGame(boolean newStartGame) {
 		startGame = newStartGame;
 	}
 	
@@ -78,14 +80,14 @@ public class Model {
 	}
 
 	public ArrayList<Candidate> getCandidates() {
-		return candidates;
+		return gameInfo.get(gameNum).getCandidates();
 	}
 
 	public synchronized Player newPlayer() {
 		int playerNum = getPlayerNumber();
 		char party = getParty();
 		int idealPt = getIdealPt();
-		Player player = new Player(playerNum, party, idealPt, getBudget(), candidates.size());
+		Player player = new Player(playerNum, party, idealPt, getBudget(), gameInfo.get(gameNum).getNumCandidates());
 		players.add(player);
 		PCS.firePropertyChange("New Player", null, playerNum);
 		return player;
@@ -94,11 +96,12 @@ public class Model {
 	public void resetPlayer(Player player) {
 		char party = getParty();
 		int idealPt = getIdealPt();
-		player.resetPlayer(party, idealPt, getBudget(), candidates.size());
+		player.resetPlayer(party, idealPt, getBudget(), gameInfo.get(gameNum).getNumCandidates());
 	}
 	
 	public void removePlayer(Player player) {
 		players.remove(player);
+		PCS.firePropertyChange("Removed Player", null, player.getPlayerNumber());
 	}
 
 	public int getPlayerNumber() {
@@ -127,7 +130,7 @@ public class Model {
 	}
 
 	public Candidate getCandidate(int candNum) {
-		return candidates.get(candNum);
+		return gameInfo.get(gameNum).getCandidates().get(candNum);
 	}
 	
 	public int getNumPlayers() {
@@ -144,7 +147,7 @@ public class Model {
 	}
 	
 	public ArrayList<Candidate> getSortedCandidates() {
-		ArrayList<Candidate> tempCands = new ArrayList<Candidate>(this.candidates);
+		ArrayList<Candidate> tempCands = new ArrayList<Candidate>(gameInfo.get(gameNum).getCandidates());
 		for (int i=0; i<tempCands.size(); i++) {
 			Candidate currentI = tempCands.get(i);
 			for (int j=i; j<tempCands.size(); j++) {
@@ -158,25 +161,24 @@ public class Model {
 		return tempCands;
 	}
 	
-	public Candidate getWinner() {
-		ArrayList<Candidate> tempCands = new ArrayList<Candidate>(this.candidates);
-		for (int i=0; i<tempCands.size(); i++) {
-			Candidate currentI = tempCands.get(i);
-			for (int j=i; j<tempCands.size(); j++) {
-				Candidate currentJ = tempCands.get(j);
+	public Candidate getWinner(ArrayList<Candidate> candidates) {
+		for (int i=0; i<candidates.size(); i++) {
+			Candidate currentI = candidates.get(i);
+			for (int j=i; j<candidates.size(); j++) {
+				Candidate currentJ = candidates.get(j);
 				if (currentI.getSecondVotes() > currentJ.getSecondVotes()) {
-					tempCands.set(j, currentI);
-					tempCands.set(i, currentJ);
+					candidates.set(j, currentI);
+					candidates.set(i, currentJ);
 				}
 			}
 		}
-		return tempCands.get(candidates.size()-1);
+		return candidates.get(candidates.size()-1);
 	}
 	
 	public boolean winnerIsClosest(int playerIdeal, Candidate candidate) {
 		boolean isClosest = true;
 		int diffToBeat = Math.abs(playerIdeal-candidate.getIdealPt());
-		for (Candidate other : candidates) {
+		for (Candidate other : gameInfo.get(gameNum).getCandidates()) {
 			int currentDiff = Math.abs(playerIdeal-other.getIdealPt());
 			if (currentDiff < diffToBeat) {
 				isClosest = false;

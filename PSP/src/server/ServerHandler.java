@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import model.Candidate;
 import model.Model;
 import model.Player;
@@ -42,6 +44,7 @@ public class ServerHandler {
 					setRound(whichBuyRound); // Sets the round in the player's data
 					startRound(whichBuyRound); // Sends out a starting round message
 				} else if (messageType == 9) {
+					ArrayList<Candidate> candidates = model.getCandidates();
 					voteForCandidate();
 					waitForNewRound();
 					if (player.getRound() == "straw") {
@@ -49,7 +52,7 @@ public class ServerHandler {
 					} else if (player.getRound() == "first") {
 						startSecondBuy();
 					} else {
-						sendWinner();
+						sendWinner(candidates);
 						Player clone = new Player(player);
 						model.addPlayerToGameObject(clone, gameNum);
 						gameNum++;
@@ -58,6 +61,7 @@ public class ServerHandler {
 							model.resetPlayer(player);
 							startGame();
 						} else {
+							writeMessage(14, 0);
 							model.writeDataOut(); 
 						}
 					}
@@ -235,9 +239,8 @@ public class ServerHandler {
 		}
 	}
 	
-	private void sendWinner() {
-		Candidate winner = model.getWinner();
-		System.out.println("winner: " + winner.getCandidateNumber());
+	private void sendWinner(ArrayList<Candidate> candidates) {
+		Candidate winner = model.getWinner(candidates);
 		writeMessage(13, winner.getCandidateNumber()); // Writes out the winner
 		boolean isClosest = model.winnerIsClosest(player.getIdealPt(), winner);
 		try {

@@ -7,6 +7,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import javax.swing.JOptionPane;
+
 import org.jfree.data.xy.IntervalXYDataset;
 
 public class ClientHandler {
@@ -17,7 +19,7 @@ public class ClientHandler {
 
 	private final String[] TABLE2BUYNAMES = {"Candidate #", "Price", "Buy"};
 	private final String[] TABLE2VOTENAMES = {"Candidate #", "Vote"};
-	private final String[] TABLE1NAMES = {"Candidate #", "Party", "Ideal Point", "Straw Votes", "First Round Votes"};
+	private final String[] TABLE1NAMES = {"Candidate #", "Party", "Best Guess", "Straw Votes", "First Round Votes"};
 
 	private Object[][] TABLE2BUYDATA;
 	private Object[][] TABLE2VOTEDATA;
@@ -78,13 +80,14 @@ public class ClientHandler {
 					gui.updateGUI();
 				} else if (messageType == 13) {
 					int winningCandidate = socketInputStream.readByte();
-					System.out.println("winner: " + winningCandidate);
 					boolean isClosest = socketInputStream.readBoolean();
 					if (isClosest) {
 						gui.increaseWinnings();
 					}
 					gui.setTextPane("The winner is: " + winningCandidate);
 					sleep();
+				} else if (messageType == 14) {
+					JOptionPane.showMessageDialog(null, "Game Over \nWinnings: " + gui.getWinnings());
 				} else {
 					// Read the rest and ignore
 				}
@@ -131,10 +134,10 @@ public class ClientHandler {
 				char candidateParty = (char) socketInputStream.readByte();
 				int infoPrice;
 				if (candidateParty == party) { 
-					infoPrice = 2;
+					infoPrice = 1;
 				}
 				else {
-					infoPrice = 1;
+					infoPrice = 2;
 				}
 				double[] candidateExpectations  = BetaDist.getBetaDist(0, 0);
 				for (int candidate = 0; candidate < numCandidates; candidate++) {
@@ -143,7 +146,7 @@ public class ClientHandler {
 				}
 				TABLE2BUYDATA[i] = new Object[] {candidateNumber, infoPrice, "Buy"}; 
 				TABLE2VOTEDATA[i] = new Object[] {candidateNumber, "Vote"};
-				TABLE1DATA[i] = new Object[] {candidateNumber, candidateParty, "-------", "-------", "-------"};
+				TABLE1DATA[i] = new Object[] {candidateNumber, candidateParty, "50", "-------", "-------"};
 			}
 		} catch (IOException e) {
 			// Alert that it couldn't retrieve the player data
@@ -172,7 +175,7 @@ public class ClientHandler {
 	
 	private void sleep() {
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			// FIXME Do some sort of catch
 			e.printStackTrace();

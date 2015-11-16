@@ -2,13 +2,8 @@ Game: #,1
 Budget:, 6
 Distribution:, 20,5,40,5
 Ideal Points:, 33,58
-Ideal Point:, 31
-Votes:, 2,1,1
-Candidate #s:, 0,1
-Ones:, 0,2
-Zeroes:, 0,1
-Ideal Point:, 22
-Votes:, 1,1,1
+Ideal Point:, 11
+Votes:, 1,2,2
 Candidate #s:, 0,1
 Ones:, 2,0
 Zeroes:, 4,0
@@ -16,13 +11,80 @@ Game: #,2
 Budget:, 8
 Distribution:, 30,5,70,5
 Ideal Points:, 22,78,54
-Ideal Point:, 69
-Votes:, 1,1,1
+Ideal Point:, 33
+Votes:, 3,3,2
+Candidate #s:, 0,1,2
+Ones:, 0,2,0
+Zeroes:, 0,2,0
+Game: #,3
+Budget:, 10
+Distribution:, 20,5,40,5
+Ideal Points:, 22,33,34,58,75
+Ideal Point:, 25
+Votes:, 5,4,5
+Candidate #s:, 0,1,2,3,4
+Ones:, 0,0,3,0,2
+Zeroes:, 0,0,3,0,0
+Game: #,4
+Budget:, 12
+Distribution:, 30,5,80,5
+Ideal Points:, 1,10,51,52,53
+Ideal Point:, 74
+Votes:, 4,4,4
+Candidate #s:, 0,1,2,3,4
+Ones:, 0,0,1,0,0
+Zeroes:, 8,0,1,0,0
+Game: #,5
+Budget:, 6
+Distribution:, 20,5,40,5
+Ideal Points:, 43,58
+Ideal Point:, 42
+Votes:, 1,1,2
+Candidate #s:, 0,1
+Ones:, 0,2
+Zeroes:, 0,1
+Game: #,6
+Budget:, 8
+Distribution:, 30,5,70,5
+Ideal Points:, 22,78,54
+Ideal Point:, 30
+Votes:, 2,1,1
 Candidate #s:, 0,1,2
 Ones:, 0,0,0
-Zeroes:, 0,0,0
-Ideal Point:, 63
-Votes:, 2,3,3
+Zeroes:, 4,0,0
+Game: #,7
+Budget:, 8
+Distribution:, 10,5,70,5
+Ideal Points:, 22,78,54
+Ideal Point:, 60
+Votes:, 2,3,2
 Candidate #s:, 0,1,2
-Ones:, 0,0,0
-Zeroes:, 0,0,0
+Ones:, 0,0,5
+Zeroes:, 0,0,3
+Game: #,8
+Budget:, 14
+Distribution:, 30,5,70,5
+Ideal Points:, 22,54,64,74
+Ideal Point:, 34
+Votes:, 4,4,3
+Candidate #s:, 0,1,2,3
+Ones:, 0,2,0,0
+Zeroes:, 0,5,0,0
+Game: #,9
+Budget:, 8
+Distribution:, 30,5,70,5
+Ideal Points:, 22,78,54
+Ideal Point:, 70
+Votes:, 3,3,3
+Candidate #s:, 0,1,2
+Ones:, 0,3,0
+Zeroes:, 0,1,0
+Game: #,10
+Budget:, 8
+Distribution:, 30,5,70,5
+Ideal Points:, 22,32,42,52,62,72
+Ideal Point:, 82
+Votes:, 6,3,3
+Candidate #s:, 0,1,2,3,4,5
+Ones:, 0,0,0,1,0,3
+Zeroes:, 0,0,2,0,0,0
