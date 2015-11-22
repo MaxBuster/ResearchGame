@@ -13,12 +13,12 @@ public class Model {
 	private int[] sumPoints;
 	private int sumDataPoints;
 	private ArrayList<Player> players;
-	private boolean dataWritten = false;
 	private boolean startGame = true;
 	private int roundNum = 0;
 	private String[] roundNames = new String[]{"First Buy", "Straw Vote", "First Vote", "Second Buy", "Second Vote", "Over"};
 	private int gameNum = 0;
 	private ArrayList<GameInfo> gameInfo;
+	private int numDone = 0;
 	
 	public Model(final PropertyChangeSupport PCS, ArrayList<GameInfo> gameInfo) {
 		this.PCS = PCS;
@@ -85,8 +85,8 @@ public class Model {
 
 	public synchronized Player newPlayer() {
 		int playerNum = getPlayerNumber();
-		char party = getParty();
 		int idealPt = getIdealPt();
+		char party = getParty(idealPt);
 		Player player = new Player(playerNum, party, idealPt, getBudget(), gameInfo.get(gameNum).getNumCandidates());
 		players.add(player);
 		PCS.firePropertyChange("New Player", null, playerNum);
@@ -94,8 +94,8 @@ public class Model {
 	}
 	
 	public void resetPlayer(Player player) {
-		char party = getParty();
 		int idealPt = getIdealPt();
+		char party = getParty(idealPt);
 		player.resetPlayer(party, idealPt, getBudget(), gameInfo.get(gameNum).getNumCandidates());
 	}
 	
@@ -120,9 +120,8 @@ public class Model {
 		return 100;
 	}
 
-	public char getParty() {
-		double randomNum = Math.random();
-		if (randomNum < .5) {
+	public char getParty(int idealPt) {
+		if (idealPt < 50) {
 			return 'R';
 		} else {
 			return 'D';
@@ -148,43 +147,26 @@ public class Model {
 	
 	public ArrayList<Candidate> getSortedCandidates() {
 		ArrayList<Candidate> tempCands = new ArrayList<Candidate>(gameInfo.get(gameNum).getCandidates());
-		for (int i=0; i<tempCands.size(); i++) {
-			Candidate currentI = tempCands.get(i);
-			for (int j=i; j<tempCands.size(); j++) {
-				Candidate currentJ = tempCands.get(j);
-				if (currentI.getFirstVotes() > currentJ.getFirstVotes()) {
-					tempCands.set(j, currentI);
-					tempCands.set(i, currentJ);
-				}
+		Collections.sort(tempCands, new Comparator<Candidate>() {
+			public int compare(Candidate cand1, Candidate cand2) {
+				return cand2.getFirstVotes() - cand1.getFirstVotes();
 			}
-		}
+		});
 		return tempCands;
 	}
 	
 	public Candidate getWinner(ArrayList<Candidate> candidates) {
-		for (int i=0; i<candidates.size(); i++) {
-			Candidate currentI = candidates.get(i);
-			for (int j=i; j<candidates.size(); j++) {
-				Candidate currentJ = candidates.get(j);
-				if (currentI.getSecondVotes() > currentJ.getSecondVotes()) {
-					candidates.set(j, currentI);
-					candidates.set(i, currentJ);
-				}
+		ArrayList<Candidate> tempCands = new ArrayList<Candidate>(candidates);
+		Collections.sort(tempCands, new Comparator<Candidate>() {
+			public int compare(Candidate cand1, Candidate cand2) {
+				return cand2.getSecondVotes() - cand1.getSecondVotes();
 			}
-		}
-		return candidates.get(candidates.size()-1);
+		});
+		return tempCands.get(0);
 	}
 	
-	public boolean winnerIsClosest(int playerIdeal, Candidate candidate) {
-		boolean isClosest = true;
-		int diffToBeat = Math.abs(playerIdeal-candidate.getIdealPt());
-		for (Candidate other : gameInfo.get(gameNum).getCandidates()) {
-			int currentDiff = Math.abs(playerIdeal-other.getIdealPt());
-			if (currentDiff < diffToBeat) {
-				isClosest = false;
-			}
-		}
-		return isClosest;
+	public int[] getPayoffNums() {
+		return gameInfo.get(gameNum).getPayoffNums();
 	}
 
 	public synchronized boolean checkEndRound() {
@@ -206,8 +188,8 @@ public class Model {
 	}
 	
 	public synchronized void writeDataOut() {
-		if (!dataWritten) {
-			dataWritten = true;
+		numDone++;
+		if (numDone == players.size()) {
 			WriteDataOut.writeData(gameInfo);
 		}
 	}

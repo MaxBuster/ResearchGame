@@ -57,11 +57,18 @@ public class ReadConfig {
 							for (int i=0; i<distribution.length; i++) {
 								distributionNums[i] = Integer.parseInt(distribution[i]);
 							}
+							line = bReader.readLine();
+							// FIXME Check that the line is not blank
+							String[] payoffInfo = cleanArray(line.split("[ ]*,[ ]*"));
+							int[] payoffNums = new int[payoffInfo.length];
+							for (int i=0; i<payoffInfo.length; i++) {
+								payoffNums[i] = Integer.parseInt(payoffInfo[i]);
+							}
 							// FIXME get parties of cands too
 							if ((line = bReader.readLine()) != null) {
 								line = line.replace(",", "");
 								int budget = Integer.parseInt(line); // FIXME Catch errors thrown by this
-								GameInfo game = new GameInfo(gameNum, candidateNums, partyChars, distributionNums, budget);
+								GameInfo game = new GameInfo(gameNum, candidateNums, partyChars, distributionNums, budget, payoffNums);
 								games.add(game);
 								gameNum++;
 							}

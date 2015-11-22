@@ -6,6 +6,8 @@ import java.beans.PropertyChangeSupport;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 
 import javax.swing.JOptionPane;
 
@@ -52,8 +54,8 @@ public class ClientHandler {
 					getAndSetChart();
 				} else if (messageType == 2) { // Getting candidates and starting the game
 					String gameDescription = "There will five rounds: buy info, straw vote, first vote, buy info, second vote \n"
-							+ "The goal is to try to try to get the candidate to win with the closest ideal point to you \n"
-							+ "It is currently the first buy round. Candidates with the same party as you cost twice as much";
+							+ "The goal is to try to get the candidate to win with the closest ideal point to you \n"
+							+ "It is currently the first buy round. Candidates with the opposite party cost twice as much";
 					gui.setTextPane(gameDescription);
 					getAndSetCandidateInfo();
 					gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
@@ -80,10 +82,9 @@ public class ClientHandler {
 					gui.updateGUI();
 				} else if (messageType == 13) {
 					int winningCandidate = socketInputStream.readByte();
-					boolean isClosest = socketInputStream.readBoolean();
-					if (isClosest) {
-						gui.increaseWinnings();
-					}
+					int winnings = socketInputStream.readInt();
+					int budgetMultiple = socketInputStream.readInt();
+					gui.increaseWinnings(winnings, budgetMultiple);
 					gui.setTextPane("The winner is: " + winningCandidate);
 					sleep();
 				} else if (messageType == 14) {
@@ -134,10 +135,10 @@ public class ClientHandler {
 				char candidateParty = (char) socketInputStream.readByte();
 				int infoPrice;
 				if (candidateParty == party) { 
-					infoPrice = 1;
+					infoPrice = 10;
 				}
 				else {
-					infoPrice = 2;
+					infoPrice = 20;
 				}
 				double[] candidateExpectations  = BetaDist.getBetaDist(0, 0);
 				for (int candidate = 0; candidate < numCandidates; candidate++) {
@@ -172,7 +173,7 @@ public class ClientHandler {
 			// Alert that it couldn't retrieve the player data
 		}
 	}
-	
+
 	private void sleep() {
 		try {
 			Thread.sleep(3000);
@@ -195,14 +196,17 @@ public class ClientHandler {
 			int numCandidates = socketInputStream.readByte();
 			int round = socketInputStream.readByte();
 			// If its 0 then do straw if its 1 then start buy after
-			int[] candNums = new int[numCandidates];
+			int[] candNums = new int[2];
 			for (int i = 0; i < numCandidates; i++) {
 				int candNum = socketInputStream.readByte();
 				int numVotes = socketInputStream.readInt();
 				addToTable1Data(candNum-1, round+3, numVotes+"%"); 
 
-				candNums[i] = candNum;
+				if (i < 2) {
+					candNums[i] = candNum;
+				}
 			}
+			Arrays.sort(candNums);
 			if (round == 0) {
 				String firstVoteDescription = "This is the first real vote. \n"
 						+ "The top two candidates from this round will continue to the final vote.";
@@ -214,10 +218,10 @@ public class ClientHandler {
 			} else if (round == 1) {
 				Object[][] TempTable2BuyData = new Object[2][]; 
 				Object[][] TempTable2VoteData = new Object[2][];
-				TempTable2BuyData[0] = TABLE2BUYDATA[candNums[numCandidates-1]-1];
-				TempTable2VoteData[0] = TABLE2VOTEDATA[candNums[numCandidates-1]-1];
-				TempTable2BuyData[1] = TABLE2BUYDATA[candNums[numCandidates-2]-1];
-				TempTable2VoteData[1] = TABLE2VOTEDATA[candNums[numCandidates-2]-1];
+				TempTable2BuyData[0] = TABLE2BUYDATA[candNums[0]-1];
+				TempTable2VoteData[0] = TABLE2VOTEDATA[candNums[0]-1];
+				TempTable2BuyData[1] = TABLE2BUYDATA[candNums[1]-1];
+				TempTable2VoteData[1] = TABLE2VOTEDATA[candNums[1]-1];
 				TABLE2BUYDATA = TempTable2BuyData;
 				TABLE2VOTEDATA = TempTable2VoteData;
 

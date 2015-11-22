@@ -7,6 +7,8 @@ import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.math3.util.Pair;
+
 import model.Candidate;
 import model.Model;
 import model.Player;
@@ -105,14 +107,10 @@ public class ServerHandler {
 			int random = (int) (Math.random()*100);
 			int signal = (random > ideal) ? 0 : 1;
 			player.addInfo(candidateToBuyFrom, signal);
-			int[] info = player.getInfo(candidateToBuyFrom);
-			
-			int tokens = info[0] + info[1]; 
-			int signals = info[1];
-
+			Pair<Integer, Integer> info = player.getInfo(candidateToBuyFrom);
 			writeMessage(6, candidateToBuyFrom);
-			out.writeInt(tokens);
-			out.writeInt(signals);
+			out.writeInt(info.getSecond());
+			out.writeInt(info.getFirst());
 		} catch (IOException e) {
 			removePlayer();
 		}
@@ -156,6 +154,7 @@ public class ServerHandler {
 
 	private void startSecondBuy() {
 		try {
+			player.setRound("buy2");
 			ArrayList<Candidate> candidates = model.getSortedCandidates();
 			writeMessage(10, candidates.size()); 
 			out.writeByte(1);
@@ -219,6 +218,7 @@ public class ServerHandler {
 			if (whichBuyRound == 1) {
 				out.writeByte(8); // This starts straw round
 			} else {
+				player.setRound("final");
 				out.writeByte(11); // This starts final round
 			}
 		} catch (IOException e) {
@@ -242,9 +242,11 @@ public class ServerHandler {
 	private void sendWinner(ArrayList<Candidate> candidates) {
 		Candidate winner = model.getWinner(candidates);
 		writeMessage(13, winner.getCandidateNumber()); // Writes out the winner
-		boolean isClosest = model.winnerIsClosest(player.getIdealPt(), winner);
 		try {
-			out.writeBoolean(isClosest);
+			int[] payoffNums = model.getPayoffNums();
+			int winnings = payoffNums[0] - (payoffNums[1]*(Math.abs(winner.getIdealPt() - player.getIdealPt())));
+			out.writeInt(winnings); // Winnings from candidate
+			out.writeInt(payoffNums[2]); // Multiple for leftover budget
 		} catch (IOException e) {
 			removePlayer();
 		}

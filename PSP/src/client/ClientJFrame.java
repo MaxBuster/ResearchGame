@@ -151,7 +151,9 @@ public class ClientJFrame extends JFrame {
 		
 		renderer.setSeriesShapesVisible(0, false);
 		Color[] colors = new Color[]{new Color(0, 0 ,153), new Color(0, 153, 0), new Color(255, 102, 0), 
-									new Color(255, 255, 0), new Color(153, 0, 153), new Color(255,0,204)};
+									new Color(255, 255, 0), new Color(153, 0, 153), new Color(255,0,204), 
+									new Color(255, 204, 204), new Color(0, 255, 255), new Color(102,0,51), 
+									new Color(139,69,19)};
 		renderer.setSeriesPaint(0, colors[candidate]);
 		graph.getXYPlot().setRenderer(candidate+1, renderer); 
 	}
@@ -201,9 +203,9 @@ public class ClientJFrame extends JFrame {
 		contentPane.remove(scrollPane2);
 	}
 
-	public void increaseWinnings() {
-		winnings++;
-		winnings += budget;
+	public void increaseWinnings(int roundWinnings, int multiple) {
+		winnings += roundWinnings; // FIXME make these amounts conditional
+		winnings += budget*multiple;
 		lblWinnings.setText("Winnings: " + winnings);
 		updateGUI();
 	}
