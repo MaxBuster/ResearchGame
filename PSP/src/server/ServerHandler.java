@@ -32,144 +32,122 @@ public class ServerHandler {
 		waitForGameStart();
 		startGame();
 		while (true) {
+			String type = newMessage();
+			int message;
 			try {
-				char c = (char) in.readByte();
-				while (c != '!') {
-					c = (char) in.readByte();
-				}
-				int messageType = in.readByte();
-				if (messageType == 5) { // Bought info
-					returnInfo();
-				} else if (messageType == 7) { // Ended a buy round
-					int whichBuyRound = in.readByte();
-					waitForNewRound(); // Waits for all players to be done with the round
-					setRound(whichBuyRound); // Sets the round in the player's data
-					startRound(whichBuyRound); // Sends out a starting round message
-				} else if (messageType == 9) {
-					ArrayList<Candidate> candidates = model.getCandidates();
-					voteForCandidate();
-					waitForNewRound();
-					if (player.getRound() == "straw") {
-						startFirstVote();
-					} else if (player.getRound() == "first") {
-						startSecondBuy();
-					} else {
-						sendWinner(candidates);
-						Player clone = new Player(player);
-						model.addPlayerToGameObject(clone, gameNum);
-						gameNum++;
-						if (gameNum < model.getNumGames()) {
-							model.getNewGame(gameNum);
-							model.resetPlayer(player);
-							startGame();
-						} else {
-							writeMessage(14, 0);
-							model.writeDataOut(); 
-						}
-					}
-				} else {
-					// Exceptions?
-				}
+				message = in.readInt(); 
 			} catch (IOException e) {
 				removePlayer();
 				break; // End client
 			}
+
+			if (type.equals("Buy Info")) { // Bought info
+				returnInfo(message);
+			} else if (type.equals("End Buy")) { // Ended a buy round
+				waitForNewRound(); // Waits for all players to be done with the round
+				setRound(message); // Sets the round in the player's data
+				startRound(message); // Sends out a starting round message
+			} else if (type.equals("Vote")) {
+				ArrayList<Candidate> candidates = model.getCandidates();
+				voteForCandidate(message);
+				waitForNewRound();
+				if (player.getRound() == "straw") {
+					startFirstVote();
+				} else if (player.getRound() == "first") {
+					startSecondBuy();
+				} else {
+					sendWinner(candidates);
+					Player clone = new Player(player);
+					model.addPlayerToGameObject(clone, gameNum);
+					gameNum++;
+					if (gameNum < model.getNumGames()) {
+						model.getNewGame(gameNum);
+						model.resetPlayer(player);
+						startGame();
+					} else {
+						writeMessage("Games Over");
+						model.writeDataOut(); 
+					}
+				}
+			} else {
+				// Exceptions?
+			}
 		}
 	}
-	
+
 	private void startGame() {
-		try {
-			writeMessage(0, player.getPlayerNumber());
-			out.writeChar(player.getParty());
-			out.writeInt(player.getIdealPt());
-			out.writeInt(model.getBudget());
-		} catch (IOException e1) {
-			removePlayer();
-		}
+		writeMessage("Start Game");
+		writeInt(player.getPlayerNumber());
+		writeInt(player.getParty());
+		writeInt(player.getIdealPt());
+		writeInt(model.getBudget());
+
 		writeChartData();
 		ArrayList<Candidate> candidates = model.getCandidates();
-		writeMessage(2, candidates.size());
+		writeMessage("Candidates");
+		writeInt(candidates.size());
 		for (int i = 0; i < candidates.size(); i++) {
-			try {
-				out.writeByte(candidates.get(i).getCandidateNumber());
-				out.writeByte(candidates.get(i).getParty());
-			} catch (IOException e) {
-				removePlayer();
-			}
+			writeInt(candidates.get(i).getCandidateNumber());
+			writeInt(candidates.get(i).getParty());
 		}
 	}
 
-	private void returnInfo() {
-		try {
-			int candidateToBuyFrom = in.readInt();
-			Candidate candidate = model.getCandidate(candidateToBuyFrom);
-			int ideal = candidate.getIdealPt();
-			int random = (int) (Math.random()*100);
-			int signal = (random > ideal) ? 0 : 1;
-			player.addInfo(candidateToBuyFrom, signal);
-			Pair<Integer, Integer> info = player.getInfo(candidateToBuyFrom);
-			writeMessage(6, candidateToBuyFrom);
-			out.writeInt(info.getSecond());
-			out.writeInt(info.getFirst());
-		} catch (IOException e) {
-			removePlayer();
-		}
+	private void returnInfo(int candidateToBuyFrom) {
+		Candidate candidate = model.getCandidate(candidateToBuyFrom);
+		int ideal = candidate.getIdealPt();
+		int random = (int) (Math.random()*100);
+		int signal = (random > ideal) ? 0 : 1;
+		player.addInfo(candidateToBuyFrom, signal);
+		Pair<Integer, Integer> info = player.getInfo(candidateToBuyFrom);
+		writeMessage("Purchased Info");
+		writeInt(candidateToBuyFrom);
+		writeInt(info.getFirst()); // Ones
+		writeInt(info.getSecond()); // Total Tokens
 	}
 
-	private void voteForCandidate() {
-		try {
-			int candidateToVoteFor = in.readByte();
-			if (player.getRound() == "first") {
-				model.getCandidate(candidateToVoteFor).voteFirst();
-				player.addVote(candidateToVoteFor, 1);
-			} else if (player.getRound() == "final") {
-				model.getCandidate(candidateToVoteFor).voteSecond();
-				player.addVote(candidateToVoteFor, 2);
-			} else {
-				model.getCandidate(candidateToVoteFor).voteStraw();
-				player.addVote(candidateToVoteFor, 0);
-			}
-		}  catch (IOException e) {
-			removePlayer();
+	private void voteForCandidate(int candidateToVoteFor) {
+		if (player.getRound() == "first") {
+			model.getCandidate(candidateToVoteFor).voteFirst();
+			player.addVote(candidateToVoteFor, 1);
+		} else if (player.getRound() == "final") {
+			model.getCandidate(candidateToVoteFor).voteSecond();
+			player.addVote(candidateToVoteFor, 2);
+		} else {
+			model.getCandidate(candidateToVoteFor).voteStraw();
+			player.addVote(candidateToVoteFor, 0);
 		}
 	}
 
 	private void startFirstVote() {
-		try {
-			ArrayList<Candidate> candidates = model.getCandidates();
-			player.setRound("first");
-			writeMessage(10, candidates.size());
-			out.writeByte(0);
-			int numPlayers = model.getNumPlayers();
-			for (Candidate candidate : candidates) {
-				out.writeByte(candidate.getCandidateNumber());
-				int numVotes = candidate.getStrawVotes();
-				int percentVotes = ((numVotes*100)/numPlayers);
-				out.writeInt(percentVotes);
-			}
-		}  catch (IOException e) {
-			removePlayer();
+		ArrayList<Candidate> candidates = model.getCandidates();
+		player.setRound("first");
+		writeMessage("Straw Results");
+		writeInt(candidates.size());
+		writeInt(0); // Start First Round FIXME Change to a var
+		int numPlayers = model.getNumPlayers();
+		for (Candidate candidate : candidates) {
+			int numVotes = candidate.getStrawVotes();
+			int percentVotes = ((numVotes*100)/numPlayers);
+			writeInt(candidate.getCandidateNumber());
+			writeInt(percentVotes);
 		}
 	}
 
 	private void startSecondBuy() {
-		try {
-			player.setRound("buy2");
-			ArrayList<Candidate> candidates = model.getSortedCandidates();
-			writeMessage(10, candidates.size()); 
-			out.writeByte(1);
-			int numPlayers = model.getNumPlayers();
-			for (Candidate candidate : candidates) { // This writes the top candidates
-				out.writeByte(candidate.getCandidateNumber());
-				int numVotes = candidate.getFirstVotes();
-				int percentVotes = ((numVotes*100)/numPlayers);
-				out.writeInt(percentVotes);
-			}
-		}  catch (IOException e) {
-			removePlayer();
+		player.setRound("buy2");
+		ArrayList<Candidate> candidates = model.getSortedCandidates();
+		writeMessage("First Results"); 
+		writeInt(candidates.size());
+		writeInt(1); // Start Last Round FIXME Change to a var
+		int numPlayers = model.getNumPlayers();
+		for (Candidate candidate : candidates) { // This writes the top candidates
+			int numVotes = candidate.getFirstVotes();
+			int percentVotes = ((numVotes*100)/numPlayers);
+			writeInt(candidate.getCandidateNumber());
+			writeInt(percentVotes);
 		}
 	}
-	
+
 	private void waitForGameStart() {
 		synchronized (waitObject) {
 			if (!model.getStartGame()) {
@@ -182,7 +160,7 @@ public class ServerHandler {
 			waitObject.notifyAll();
 		}
 	}
-	
+
 	public static void notifyWaiters() {
 		synchronized (waitObject) {
 			waitObject.notifyAll();
@@ -213,55 +191,63 @@ public class ServerHandler {
 	}
 
 	private void startRound(int whichBuyRound) {
-		try {
-			out.writeByte((int) '!');
-			if (whichBuyRound == 1) {
-				out.writeByte(8); // This starts straw round
-			} else {
-				player.setRound("final");
-				out.writeByte(11); // This starts final round
-			}
-		} catch (IOException e) {
-			removePlayer();
+		if (whichBuyRound == 1) { // FIXME Change number to var/enum
+			writeMessage("Start Straw");
+		} else {
+			writeMessage("Start Final");
+			player.setRound("final");
 		}
 	}
 
 	private void writeChartData() {
 		int[] chartData = model.getData();
-		try {
-			out.writeByte((int) '!');
-			out.writeByte(1);
-			for (int i = 0; i < 4; i++) {
-				out.writeInt(chartData[i]);
-			}
-		} catch (IOException e) {
-			removePlayer();
+		writeMessage("Chart Data");
+		for (int i = 0; i < 4; i++) {
+			writeInt(chartData[i]);
 		}
 	}
-	
+
 	private void sendWinner(ArrayList<Candidate> candidates) {
 		Candidate winner = model.getWinner(candidates);
-		writeMessage(13, winner.getCandidateNumber()); // Writes out the winner
+		writeMessage("Winner"); // Writes out the winner
+		writeInt(winner.getCandidateNumber());
+		int[] payoffNums = model.getPayoffNums();
+		int winnings = payoffNums[0] - (payoffNums[1]*(Math.abs(winner.getIdealPt() - player.getIdealPt())));
+		writeInt(winnings);
+		writeInt(payoffNums[2]); // FIXME Get rid of this when multiple is removed
+	}
+
+	private String newMessage() {
 		try {
-			int[] payoffNums = model.getPayoffNums();
-			int winnings = payoffNums[0] - (payoffNums[1]*(Math.abs(winner.getIdealPt() - player.getIdealPt())));
-			out.writeInt(winnings); // Winnings from candidate
-			out.writeInt(payoffNums[2]); // Multiple for leftover budget
+			char c = (char) in.readByte();
+			while (c != '!') {
+				c = (char) in.readByte();
+			}
+			String type = in.readUTF();
+			return type;
+		} catch (IOException e) {
+			removePlayer();
+			return null;
+		}
+	}
+
+	private void writeMessage(String type) {
+		try {
+			out.writeByte((int) '!');
+			out.writeUTF(type);
 		} catch (IOException e) {
 			removePlayer();
 		}
 	}
 
-	private void writeMessage(int type, int message) {
+	private void writeInt(int message) {
 		try {
-			out.writeByte((int) '!');
-			out.writeByte(type);
-			out.writeByte(message);
+			out.writeInt(message);
 		} catch (IOException e) {
 			removePlayer();
 		}
 	}
-	
+
 	private void removePlayer() {
 		model.removePlayer(player);
 		if (model.checkEndRound()) {
