@@ -117,7 +117,7 @@ public class Player {
 		return this.info;
 	}
 
-	public void doneWithRound() {
+	public synchronized void doneWithRound() {
 		this.doneWithRound = true;
 	}
 	
@@ -137,7 +137,7 @@ public class Player {
 		return this.round;
 	}
 
-	public boolean checkIfDone() {
+	public synchronized boolean checkIfDone() {
 		return this.doneWithRound;
 	}
 

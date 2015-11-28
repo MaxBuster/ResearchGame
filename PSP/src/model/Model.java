@@ -93,13 +93,13 @@ public class Model {
 		return player;
 	}
 	
-	public void resetPlayer(Player player) {
+	public synchronized void resetPlayer(Player player) {
 		int idealPt = getIdealPt();
 		char party = getParty(idealPt);
 		player.resetPlayer(party, idealPt, getBudget(), gameInfo.get(gameNum).getNumCandidates());
 	}
 	
-	public void removePlayer(Player player) {
+	public synchronized void removePlayer(Player player) {
 		players.remove(player);
 		PCS.firePropertyChange("Removed Player", null, player.getPlayerNumber());
 	}
@@ -132,11 +132,11 @@ public class Model {
 		return gameInfo.get(gameNum).getCandidates().get(candNum);
 	}
 	
-	public int getNumPlayers() {
+	public synchronized int getNumPlayers() {
 		return players.size();
 	}
 	
-	public Player getPlayer(int playerNum) {
+	public synchronized Player getPlayer(int playerNum) {
 		for (Player player : players) {
 			if (player.getPlayerNumber() == playerNum) {
 				return player;
@@ -192,5 +192,6 @@ public class Model {
 		if (numDone == players.size()) {
 			WriteDataOut.writeData(gameInfo);
 		}
+		PCS.firePropertyChange("Game Over", null, null);
 	}
 }

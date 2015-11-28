@@ -89,6 +89,7 @@ public class ClientHandler {
 					sleep();
 				} else if (messageType == 14) {
 					JOptionPane.showMessageDialog(null, "Game Over \nWinnings: " + gui.getWinnings());
+					gui.allowClose();
 				} else {
 					// Read the rest and ignore
 				}
@@ -250,7 +251,7 @@ public class ClientHandler {
 				try {
 					int whichRound = (Integer) PCE.getOldValue();
 					socketOutputStream.writeChar((int) '!');
-					socketOutputStream.writeByte(7); // End buy round
+					socketOutputStream.writeByte(7); // End buy round // FIXME Change to utf
 					socketOutputStream.writeByte(whichRound); // Which buy round
 					// is ending
 				} catch (IOException e) {
@@ -263,7 +264,7 @@ public class ClientHandler {
 	private void buyInfo(int candNum) {
 		try {
 			socketOutputStream.writeChar((int) '!');
-			socketOutputStream.writeByte(5);
+			socketOutputStream.writeByte(5); // FIXME Change to utf
 			socketOutputStream.writeInt(candNum);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -273,7 +274,7 @@ public class ClientHandler {
 	private void voteForCandidate(int candNum) {
 		try {
 			socketOutputStream.writeChar((int) '!');
-			socketOutputStream.writeByte(9);
+			socketOutputStream.writeByte(9); // FIXME Change to utf
 			socketOutputStream.writeByte(candNum);
 		} catch (IOException e) {
 			e.printStackTrace();

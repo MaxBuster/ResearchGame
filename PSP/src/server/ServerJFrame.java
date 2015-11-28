@@ -41,7 +41,8 @@ public class ServerJFrame extends JFrame {
 	public ServerJFrame(final PropertyChangeSupport PCS, int numGames) {
 		this.PCS = PCS;
 		this.numGames = numGames;
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		setBounds(100, 100, 600, 600);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -113,6 +114,10 @@ public class ServerJFrame extends JFrame {
 	public void updateGUI() {
 		contentPane.revalidate();
 		contentPane.repaint();
+	}
+	
+	public void allowClose() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	class ButtonRenderer extends JButton implements TableCellRenderer {

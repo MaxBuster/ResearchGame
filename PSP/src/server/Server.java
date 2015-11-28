@@ -105,6 +105,8 @@ public class Server {
 			}  else if (PCE.getPropertyName() == "New Game") {
 				int gameNum = (Integer) PCE.getNewValue();
 				gui.setGame(gameNum+1);
+			}  else if (PCE.getPropertyName() == "Game Over") {
+				gui.allowClose();
 			}
 		}
 	}

@@ -69,8 +69,8 @@ public class ClientJFrame extends JFrame {
 	 */
 	public ClientJFrame(PropertyChangeSupport PCS) {
 		this.PCS = PCS;
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 600, 600);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setExtendedState(JFrame.MAXIMIZED_BOTH);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -212,6 +212,10 @@ public class ClientJFrame extends JFrame {
 	
 	public int getWinnings() {
 		return winnings;
+	}
+	
+	public void allowClose() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 	class ButtonRenderer extends JButton implements TableCellRenderer {
