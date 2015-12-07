@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 public class ReadConfig {
+	public static int multiplier;
+	public static int intercept;
 
 	public static String[] cleanArray(String[] input) {
 		Vector<String> cleaned = new Vector<String>();
@@ -34,52 +36,72 @@ public class ReadConfig {
 				BufferedReader bReader = new BufferedReader(fReader);
 				int gameNum = 1;
 				String line;
-				// Get first line = numgames
+				if ((line = bReader.readLine()) == null  || line.isEmpty()) {
+					bReader.close();
+					return null;
+				}
+				line = line.replace(",", "");
+				multiplier = Integer.parseInt(line);
+				if ((line = bReader.readLine()) == null  || line.isEmpty()) {
+					bReader.close();
+					return null;
+				}
+				line = line.replace(",", "");
+				intercept = Integer.parseInt(line);
 				while ((line = bReader.readLine()) != null) {
 					line = bReader.readLine();
-					// FIXME Check that the line is not blank
+					if (line == null || line.isEmpty()){
+						bReader.close();
+						return null;
+					}
 					String[] candidates = cleanArray(line.split("[ ]*,[ ]*"));
 					int[] candidateNums = new int[candidates.length];
 					for (int i=0; i<candidates.length; i++) {
-						candidateNums[i] = Integer.parseInt(candidates[i]);
+						candidateNums[i] = Integer.parseInt(candidates[i]); // FIXME parse int check
 					}
-					if ((line = bReader.readLine()) != null) {
-						// FIXME Check that the line is not blank
-						String[] parties = cleanArray(line.split("[ ]*,[ ]*"));
-						char[] partyChars = new char[parties.length];
-						for (int i=0; i<parties.length; i++) {
-							partyChars[i] = parties[i].charAt(0);
-						}
-						if ((line = bReader.readLine()) != null) {
-							String[] distribution = cleanArray(line.split(","));
-							// FIXME check that distribution is 4 long
-							int[] distributionNums = new int[distribution.length];
-							for (int i=0; i<distribution.length; i++) {
-								distributionNums[i] = Integer.parseInt(distribution[i]);
-							}
-							line = bReader.readLine();
-							// FIXME Check that the line is not blank
-							String[] payoffInfo = cleanArray(line.split("[ ]*,[ ]*"));
-							int[] payoffNums = new int[payoffInfo.length];
-							for (int i=0; i<payoffInfo.length; i++) {
-								payoffNums[i] = Integer.parseInt(payoffInfo[i]);
-							}
-							// FIXME get parties of cands too
-							if ((line = bReader.readLine()) != null) {
-								line = line.replace(",", "");
-								int budget = Integer.parseInt(line); // FIXME Catch errors thrown by this
-								GameInfo game = new GameInfo(gameNum, candidateNums, partyChars, distributionNums, budget, payoffNums);
-								games.add(game);
-								gameNum++;
-							}
-						}
+					if ((line = bReader.readLine()) == null || line.isEmpty()) {
+						bReader.close();
+						return null;
 					}
+					String[] parties = cleanArray(line.split("[ ]*,[ ]*"));
+					char[] partyChars = new char[parties.length];
+					for (int i=0; i<parties.length; i++) {
+						partyChars[i] = parties[i].charAt(0);
+					}
+					if (partyChars.length != candidateNums.length) {
+						bReader.close();
+						return null;
+					}
+					if ((line = bReader.readLine()) == null  || line.isEmpty()) {
+						bReader.close();
+						return null;
+					}
+					String[] distribution = cleanArray(line.split(","));
+					int[] distributionNums = new int[distribution.length];
+					for (int i=0; i<distribution.length; i++) {
+						distributionNums[i] = Integer.parseInt(distribution[i]);
+					}
+					if (distributionNums.length != 4) {
+						bReader.close();
+						return null;
+					}
+					if ((line = bReader.readLine()) == null  || line.isEmpty()) {
+						bReader.close();
+						return null;
+					}
+					line = line.replace(",", "");
+					int budget = Integer.parseInt(line); // FIXME Catch errors thrown by this
+					GameInfo game = new GameInfo(gameNum, candidateNums, partyChars, distributionNums, budget);
+					games.add(game);
+					gameNum++;
 				}
 				bReader.close();
 				return games;
 			} catch (FileNotFoundException e) {
 				return null;
 			} catch (IOException e) {
+				return null;
+			} catch (NumberFormatException e) {
 				return null;
 			}
 		} else {

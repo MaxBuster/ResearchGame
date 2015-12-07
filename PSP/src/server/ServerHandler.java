@@ -12,6 +12,7 @@ import org.apache.commons.math3.util.Pair;
 import model.Candidate;
 import model.Model;
 import model.Player;
+import model.ReadConfig;
 
 public class ServerHandler {
 	private Model model;
@@ -26,6 +27,10 @@ public class ServerHandler {
 		this.player = model.newPlayer();
 		this.in = in;
 		this.out = out;
+	}
+	
+	public int getPlayerNum() {
+		return player.getPlayerNumber();
 	}
 
 	public void handleIO() {
@@ -48,27 +53,7 @@ public class ServerHandler {
 				setRound(message); // Sets the round in the player's data
 				startRound(message); // Sends out a starting round message
 			} else if (type.equals("Vote")) {
-				ArrayList<Candidate> candidates = model.getCandidates();
-				voteForCandidate(message);
-				waitForNewRound();
-				if (player.getRound() == "straw") {
-					startFirstVote();
-				} else if (player.getRound() == "first") {
-					startSecondBuy();
-				} else {
-					sendWinner(candidates);
-					Player clone = new Player(player);
-					model.addPlayerToGameObject(clone, gameNum);
-					gameNum++;
-					if (gameNum < model.getNumGames()) {
-						model.getNewGame(gameNum);
-						model.resetPlayer(player);
-						startGame();
-					} else {
-						writeMessage("Games Over");
-						model.writeDataOut(); 
-					}
-				}
+				vote(message);
 			} else {
 				// Exceptions?
 			}
@@ -103,6 +88,30 @@ public class ServerHandler {
 		writeInt(candidateToBuyFrom);
 		writeInt(info.getFirst()); // Ones
 		writeInt(info.getSecond()); // Total Tokens
+	}
+	
+	private void vote(int message) {
+		ArrayList<Candidate> candidates = model.getCandidates();
+		voteForCandidate(message);
+		waitForNewRound();
+		if (player.getRound() == "straw") {
+			startFirstVote();
+		} else if (player.getRound() == "first") {
+			startSecondBuy();
+		} else {
+			sendWinner(candidates);
+			Player clone = new Player(player);
+			model.addPlayerToGameObject(clone, gameNum);
+			gameNum++;
+			if (gameNum < model.getNumGames()) {
+				model.getNewGame(gameNum);
+				model.resetPlayer(player);
+				startGame();
+			} else {
+				writeMessage("Games Over");
+				model.writeDataOut(); 
+			}
+		}
 	}
 
 	private void voteForCandidate(int candidateToVoteFor) {
@@ -211,10 +220,8 @@ public class ServerHandler {
 		Candidate winner = model.getWinner(candidates);
 		writeMessage("Winner"); // Writes out the winner
 		writeInt(winner.getCandidateNumber());
-		int[] payoffNums = model.getPayoffNums();
-		int winnings = payoffNums[0] - (payoffNums[1]*(Math.abs(winner.getIdealPt() - player.getIdealPt())));
+		int winnings = ReadConfig.intercept - (ReadConfig.multiplier*(Math.abs(winner.getIdealPt() - player.getIdealPt())));
 		writeInt(winnings);
-		writeInt(payoffNums[2]); // FIXME Get rid of this when multiple is removed
 	}
 
 	private String newMessage() {
@@ -248,7 +255,7 @@ public class ServerHandler {
 		}
 	}
 
-	private void removePlayer() {
+	public void removePlayer() {
 		model.removePlayer(player);
 		if (model.checkEndRound()) {
 			notifyWaiters();

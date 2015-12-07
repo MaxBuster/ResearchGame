@@ -11,19 +11,17 @@ public class GameInfo {
 	private int budget;
 	private LinkedList<Player> players = new LinkedList<Player>();
 	private ArrayList<Candidate> candidates = new ArrayList<Candidate>();
-	private int[] payoffNums;
 	
 	public GameInfo(int gameNum, int[] idealPts, char[] parties, int[] distribution, 
-			int budget, int[] payoffNums) {
+			int budget) {
 		this.gameNum = gameNum;
 		this.idealPts = idealPts;
 		this.parties = parties;
 		this.distribution = distribution;
 		this.budget = budget;
-		this.payoffNums = payoffNums;
 	}
 	
-	public int getGameNum() {
+	public synchronized int getGameNum() {
 		return gameNum;
 	}
 
@@ -47,7 +45,7 @@ public class GameInfo {
 		players.add(player);
 	}
 	
-	public LinkedList<Player> getPlayers() {
+	public synchronized LinkedList<Player> getPlayers() {
 		return players;
 	}
 	
@@ -61,9 +59,5 @@ public class GameInfo {
 	
 	public int getNumCandidates() {
 		return candidates.size();
-	}
-	
-	public int[] getPayoffNums() {
-		return payoffNums;
 	}
 }

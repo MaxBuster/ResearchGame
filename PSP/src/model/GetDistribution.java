@@ -7,9 +7,6 @@ public class GetDistribution {
 	private int sum = 0;
 
 	public GetDistribution(int[] graphData) {
-		// Have an array with the running totals
-		// Have accessor for running totals, total
-		// If random generated is between two values, give it that value
 		int mean1 = graphData[0];
 		int stdDev1 = graphData[1];
 		int mean2 = graphData[2];

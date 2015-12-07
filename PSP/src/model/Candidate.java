@@ -35,27 +35,27 @@ public class Candidate {
 		return idealPt;
 	}
 
-	public void voteStraw() {
+	public synchronized void voteStraw() {
 		strawVotes++;
 	}
 
-	public int getStrawVotes() {
+	public synchronized int getStrawVotes() {
 		return strawVotes;
 	}
 
-	public void voteFirst() {
+	public synchronized void voteFirst() {
 		firstRoundVotes++;
 	}
 
-	public int getFirstVotes() {
+	public synchronized int getFirstVotes() {
 		return firstRoundVotes;
 	}
 
-	public void voteSecond() {
+	public synchronized void voteSecond() {
 		secondRoundVotes++;
 	}
 
-	public int getSecondVotes() {
+	public synchronized int getSecondVotes() {
 		return secondRoundVotes;
 	}
 

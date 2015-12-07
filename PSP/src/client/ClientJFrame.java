@@ -8,6 +8,7 @@ import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeSupport;
 
 import javax.swing.JFrame;
@@ -61,7 +62,7 @@ public class ClientJFrame extends JFrame {
 	private MakeChart chart;
 	private JFreeChart graph;
 	private ChartPanel pane;
-	
+
 	private static final String WAITING_MESSAGE = "We are waiting for everyone to finish this round.";
 
 	/**
@@ -76,6 +77,7 @@ public class ClientJFrame extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new MigLayout("", "[grow,right][grow,fill][grow,fill][grow,fill][grow,fill][grow,fill][grow,left]", "[grow,top][fill][fill][100px,grow,fill][100px,grow,fill][grow,fill][grow][][grow,bottom]"));
 		genericTextPane = new JTextPane();
+		genericTextPane.setEditable(false);
 		contentPane.add(genericTextPane, "cell 1 2 5 1,grow");
 		String startingMessage = "Please wait for the game to begin";
 		genericTextPane.setText(startingMessage);
@@ -137,7 +139,7 @@ public class ClientJFrame extends JFrame {
 		ValueMarker marker = new ValueMarker(idealPoint);
 		marker.setPaint(Color.black);
 		marker.setLabel("You");
-        marker.setLabelTextAnchor(TextAnchor.TOP_RIGHT);
+		marker.setLabelTextAnchor(TextAnchor.TOP_RIGHT);
 		graph.getXYPlot().addDomainMarker(marker);
 
 		pane.setChart(graph);
@@ -148,12 +150,12 @@ public class ClientJFrame extends JFrame {
 		graph.getXYPlot().setDataset(candidate+1, data);
 
 		XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer(); 
-		
+
 		renderer.setSeriesShapesVisible(0, false);
 		Color[] colors = new Color[]{new Color(0, 0 ,153), new Color(0, 153, 0), new Color(255, 102, 0), 
-									new Color(255, 255, 0), new Color(153, 0, 153), new Color(255,0,204), 
-									new Color(255, 204, 204), new Color(0, 255, 255), new Color(102,0,51), 
-									new Color(139,69,19)};
+				new Color(255, 255, 0), new Color(153, 0, 153), new Color(255,0,204), 
+				new Color(255, 204, 204), new Color(0, 255, 255), new Color(102,0,51), 
+				new Color(139,69,19)};
 		renderer.setSeriesPaint(0, colors[candidate]);
 		graph.getXYPlot().setRenderer(candidate+1, renderer); 
 	}
@@ -164,14 +166,29 @@ public class ClientJFrame extends JFrame {
 	}
 
 	public void setScrollPane1(String[] columnNames, Object[][] data) {
-		DefaultTableModel table1Model = new DefaultTableModel(data, columnNames);
+		DefaultTableModel table1Model = new DefaultTableModel(data, columnNames) {
+			public boolean isCellEditable(int row, int column)
+			{
+				return false;
+			}
+		};
 		table1 = new JTable(table1Model);
 		scrollPane1 = new JScrollPane(table1);
 		contentPane.add(scrollPane1, "cell 1 3 5 1");
 	}
 
 	public void setScrollPane2(String[] columnNames, Object[][] data, String buttonColumn) {
-		DefaultTableModel table2Model = new DefaultTableModel(data, columnNames);
+		DefaultTableModel table2Model = new DefaultTableModel(data, columnNames){
+			public boolean isCellEditable(int row, int column)
+			{
+				if (table2.getColumnCount() == 3 && column == 2) {
+					return true;
+				} else if (table2.getColumnCount() == 2 && column == 1) {
+					return true;
+				}
+				return false;
+			}
+		};
 		table2 = new JTable(table2Model);
 
 		table2.getColumn(buttonColumn).setCellRenderer(new ButtonRenderer());
@@ -203,19 +220,24 @@ public class ClientJFrame extends JFrame {
 		contentPane.remove(scrollPane2);
 	}
 
-	public void increaseWinnings(int roundWinnings, int multiple) {
+	public void increaseWinnings(int roundWinnings) {
 		winnings += roundWinnings; // FIXME make these amounts conditional
-		winnings += budget*multiple;
+		winnings += budget;
 		lblWinnings.setText("Winnings: " + winnings);
 		updateGUI();
 	}
-	
+
 	public int getWinnings() {
 		return winnings;
 	}
-	
+
 	public void allowClose() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	public void closeWithIOException() {
+		this.setVisible(false);
+		this.dispose();
 	}
 
 	class ButtonRenderer extends JButton implements TableCellRenderer {

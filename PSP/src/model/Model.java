@@ -100,11 +100,13 @@ public class Model {
 	}
 	
 	public synchronized void removePlayer(Player player) {
-		players.remove(player);
+		if (players.contains(player)) {
+			players.remove(player);
+		}
 		PCS.firePropertyChange("Removed Player", null, player.getPlayerNumber());
 	}
 
-	public int getPlayerNumber() {
+	public synchronized int getPlayerNumber() {
 		playerNumber++;
 		return playerNumber;
 	}
@@ -163,10 +165,6 @@ public class Model {
 			}
 		});
 		return tempCands.get(0);
-	}
-	
-	public int[] getPayoffNums() {
-		return gameInfo.get(gameNum).getPayoffNums();
 	}
 
 	public synchronized boolean checkEndRound() {

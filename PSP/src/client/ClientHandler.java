@@ -48,40 +48,17 @@ public class ClientHandler {
 			} else if (type.equals("Chart Data")) { // Getting graph data
 				getAndSetChart();
 			} else if (type.equals("Candidates")) { // Getting candidates and starting the game
-				String gameDescription = "There will five rounds: buy info, straw vote, first vote, buy info, second vote \n"
-						+ "The goal is to try to get the candidate to win with the closest ideal point to you \n"
-						+ "It is currently the first buy round. Candidates with the opposite party cost twice as much";
-				gui.setTextPane(gameDescription);
 				getAndSetCandidateInfo();
-				gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
-				gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
-				gui.addEndRoundBtn(1);
-				gui.updateGUI();
 			} else if (type.equals("Purchased Info")) { // Got info
 				getAndSetPurchasedInfo();
 			} else if (type.equals("Start Straw")) { // Starting the straw vote
-				String strawVoteDescription = "It is now the straw vote. \n"
-						+ "Vote based on the information that you bought from the previous round. \n"
-						+ "This round will have no effect on the final winner, and is meant to give information about the other voters.";
-				gui.setTextPane(strawVoteDescription);
-				gui.removeScrollPane2();
-				gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
-				gui.updateGUI();
+				startStraw();
 			} else if (type.equals("Straw Results") || type.equals("First Results")) {
 				startRoundAfterVote();
 			} else if (type.equals("Start Final")) {
-				String finalVoteDescription = "This is the final vote round. \n"
-						+ "Whoever wins this round will win the election.";
-				gui.setTextPane(finalVoteDescription);
-				gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
-				gui.updateGUI();
+				startFinal();
 			} else if (type.equals("Winner")) {
-				int winningCandidate = readInt();
-				int winnings = readInt();
-				int budgetMultiple = readInt();
-				gui.increaseWinnings(winnings, budgetMultiple);
-				gui.setTextPane("The winner is: " + winningCandidate);
-				sleep();
+				endCurrentGame();
 			} else if (type.equals("Games Over")) {
 				JOptionPane.showMessageDialog(null, "Game Over \nWinnings: " + gui.getWinnings());
 				gui.allowClose();
@@ -133,6 +110,15 @@ public class ClientHandler {
 			TABLE2VOTEDATA[i] = new Object[] {candidateNumber, "Vote"};
 			TABLE1DATA[i] = new Object[] {candidateNumber, candidateParty, "50", "-------", "-------"};
 		}
+
+		String gameDescription = "There will five rounds: buy info, straw vote, first vote, buy info, second vote \n"
+				+ "The goal is to try to get the candidate to win with the closest ideal point to you \n"
+				+ "It is currently the first buy round. Candidates with the opposite party cost twice as much";
+		gui.setTextPane(gameDescription);
+		gui.setScrollPane1(TABLE1NAMES, TABLE1DATA);
+		gui.setScrollPane2(TABLE2BUYNAMES, TABLE2BUYDATA, "Buy");
+		gui.addEndRoundBtn(1);
+		gui.updateGUI();
 	}
 
 	private void getAndSetPurchasedInfo() {
@@ -150,13 +136,15 @@ public class ClientHandler {
 		gui.addDataset(candidate, data);
 		gui.updateGUI();
 	}
-
-	private void sleep() {
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	
+	private void startStraw() {
+		String strawVoteDescription = "It is now the straw vote. \n"
+				+ "Vote based on the information that you bought from the previous round. \n"
+				+ "This round will have no effect on the final winner, and is meant to give information about the other voters.";
+		gui.setTextPane(strawVoteDescription);
+		gui.removeScrollPane2();
+		gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
+		gui.updateGUI();
 	}
 
 	private void addToTable1Data(int candidateNumber, int position, Object data) {
@@ -208,6 +196,67 @@ public class ClientHandler {
 			gui.updateGUI();
 		}
 	}
+	
+	private void startFinal() {
+		String finalVoteDescription = "This is the final vote round. \n"
+				+ "Whoever wins this round will win the election.";
+		gui.setTextPane(finalVoteDescription);
+		gui.setScrollPane2(TABLE2VOTENAMES, TABLE2VOTEDATA, "Vote");
+		gui.updateGUI();
+	}
+	
+	private void endCurrentGame() {
+		int winningCandidate = readInt();
+		int winnings = readInt();
+		gui.increaseWinnings(winnings);
+		gui.setTextPane("The winner is: " + winningCandidate);
+		sleep();
+	}
+
+	private String newMessage() {
+		try {
+			char c = (char) socketInputStream.readByte();
+			while (c != '!') {
+				c = (char) socketInputStream.readByte();
+			}
+			String type = socketInputStream.readUTF();
+			return type;
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Removed from game due to IOException with server.");
+			gui.allowClose();
+			return null;
+		}
+	}
+
+	private void writeMessage(String type, int message) {
+		try {
+			socketOutputStream.writeChar((int) '!');
+			socketOutputStream.writeUTF(type); 
+			socketOutputStream.writeInt(message);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Removed from game due to IOException with server.");
+			gui.allowClose();
+		}
+	}
+
+	private int readInt() {
+		try {
+			int message = socketInputStream.readInt();
+			return message;
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Removed from game due to IOException with server.");
+			gui.allowClose();
+			return -1;
+		}
+	}
+
+	private void sleep() {
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 
 	class ChangeListener implements PropertyChangeListener {
 		@Override
@@ -224,40 +273,6 @@ public class ClientHandler {
 				int whichRound = (Integer) PCE.getOldValue();
 				writeMessage("End Buy", whichRound);
 			}
-		}
-	}
-
-	private String newMessage() {
-		try {
-			char c = (char) socketInputStream.readByte();
-			while (c != '!') {
-				c = (char) socketInputStream.readByte();
-			}
-			String type = socketInputStream.readUTF();
-			return type;
-		} catch (IOException e) {
-			e.printStackTrace(); // FIXME 
-			return null;
-		}
-	}
-
-	private void writeMessage(String type, int message) {
-		try {
-			socketOutputStream.writeChar((int) '!');
-			socketOutputStream.writeUTF(type); 
-			socketOutputStream.writeInt(message);
-		} catch (IOException e) {
-			e.printStackTrace(); // FIXME Make this end the client
-		}
-	}
-
-	private int readInt() {
-		try {
-			int message = socketInputStream.readInt();
-			return message;
-		} catch (IOException e) {
-			e.printStackTrace(); // FIXME Make this end the client
-			return -1;
 		}
 	}
 }

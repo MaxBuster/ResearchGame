@@ -51,10 +51,10 @@ public class ServerJFrame extends JFrame {
 
 		roundLabel = new JLabel("Game not started yet");
 		contentPane.add(roundLabel, "cell 3 1");
-		
+
 		gameLabel = new JLabel("Game: 1/" + numGames);
 		contentPane.add(gameLabel, "cell 4 1");
-		
+
 		startGame = new JButton("Start Game");
 		startGame.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -63,12 +63,20 @@ public class ServerJFrame extends JFrame {
 			}
 		});
 		contentPane.add(startGame, "cell 3 2");
-		
+
 		addScrollPane();
 	}
-	
+
 	public void addScrollPane() {
-		DefaultTableModel table1Model = new DefaultTableModel(data, columnNames);
+		DefaultTableModel table1Model = new DefaultTableModel(data, columnNames){
+			public boolean isCellEditable(int row, int column)
+			{
+				if (column == 1) {
+					return true;
+				} 
+				return false;
+			}
+		};
 		table = new JTable(table1Model);
 		table.getColumn("Remove").setCellRenderer(new ButtonRenderer());
 		table.getColumn("Remove").setCellEditor(new ButtonEditor(new JCheckBox()));
@@ -76,11 +84,11 @@ public class ServerJFrame extends JFrame {
 		table.setPreferredScrollableViewportSize(d);
 		scrollPane = new JScrollPane(table);
 		contentPane.add(scrollPane, "cell 1 8 5 1,grow");
-		
+
 		contentPane.revalidate();
 		contentPane.repaint();
 	}
-	
+
 	public void addRowToPlayers(int playerNumber) {
 		contentPane.remove(scrollPane);
 		Object[][] newData = new Object[data.length+1][2];
@@ -91,35 +99,48 @@ public class ServerJFrame extends JFrame {
 		this.data = newData;
 		addScrollPane();
 	}
-	
+
 	public void setRound(String round) {
 		roundLabel.setText("Round: " + round);
 	}
-	
+
 	public void setGame(int gameNum) {
 		gameLabel.setText("Game: " + gameNum + "/" + numGames);
 	}
-	
+
 	public void removePlayer(int playerNumber) {
+		boolean playerExists = false;
 		for (int i=0; i<table.getModel().getRowCount(); i++) {
 			int rowPlayerNumber = (Integer) table.getModel().getValueAt(i, 0);
 			if (rowPlayerNumber == playerNumber) {
+				playerExists = true;
 				((DefaultTableModel) table.getModel()).removeRow(i);
 				table.revalidate();
 				table.repaint();
 			}
 		}
+		if (playerExists) {
+			Object[][] newData = new Object[data.length-1][2];
+			int posInNewData = 0;
+			for (int i=0; i<data.length; i++) {
+				if (!data[i][0].equals(playerNumber)) {
+					newData[posInNewData] = data[i];
+					posInNewData++;
+				}
+			}
+			this.data = newData;
+		}
 	}
-	
+
 	public void updateGUI() {
 		contentPane.revalidate();
 		contentPane.repaint();
 	}
-	
+
 	public void allowClose() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
+
 	class ButtonRenderer extends JButton implements TableCellRenderer {
 
 		public ButtonRenderer() {
@@ -159,8 +180,8 @@ public class ServerJFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					int selectedRow = table.getSelectedRow();
 					int playerNumber = (Integer) table.getModel().getValueAt(selectedRow, 0);
-					PCS.firePropertyChange("Remove Player", null, playerNumber);
 					fireEditingStopped();
+					PCS.firePropertyChange("Remove Player", null, playerNumber);
 				}
 			});
 		}
@@ -185,10 +206,6 @@ public class ServerJFrame extends JFrame {
 				@Override
 				public void run() {
 					if (isPushed) {
-						int selectedRow = table.getSelectedRow();
-						((DefaultTableModel) table.getModel()).removeRow(selectedRow);
-						table.revalidate();
-						table.repaint();
 						isPushed = false;
 					}
 				}

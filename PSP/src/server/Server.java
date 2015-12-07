@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javax.swing.JOptionPane;
 
@@ -26,16 +27,17 @@ public class Server {
 	private Model model;
 	private static ServerSocket serverSocket;
 	private static ServerJFrame gui;
+	private HashMap<Integer, ServerHandler> clientHandlers = new HashMap<Integer, ServerHandler>();
+	private HashMap<Integer, Socket> clientSockets = new HashMap<Integer, Socket>();
 
-	public Server() {
-		ArrayList<GameInfo> gameInfo = ReadConfig.readFile();
+	public Server(ArrayList<GameInfo> gameInfo) {
 		this.model = new Model(PCS, gameInfo);
 
 		try {
 			serverSocket = new ServerSocket(10501);
 			PCS.addPropertyChangeListener(new ChangeListener());
 
-			//model.setStartGame(false); 
+			model.setStartGame(false); 
 			gui = new ServerJFrame(PCS, model.getNumGames());
 			gui.setVisible(true);
 		} catch (IOException e) {
@@ -65,8 +67,9 @@ public class Server {
 							clientSocket.getInputStream());
 					DataOutputStream out = new DataOutputStream(
 							clientSocket.getOutputStream());
-					ServerHandler serverHandler = new ServerHandler(model, in,
-							out);
+					ServerHandler serverHandler = new ServerHandler(model, in, out);
+					clientHandlers.put(serverHandler.getPlayerNum(), serverHandler);
+					clientSockets.put(serverHandler.getPlayerNum(), clientSocket);
 					serverHandler.handleIO();
 				} catch (EOFException e) {
 					e.printStackTrace();
@@ -89,13 +92,20 @@ public class Server {
 				gui.setRound("First Buy");
 			} else if (PCE.getPropertyName() == "Remove Player") { // Gui removed player
 				int playerNumber = (Integer) PCE.getNewValue();
-				Player playerToRemove = model.getPlayer(playerNumber);
-				if (playerToRemove != null) {
-					model.removePlayer(playerToRemove);
+				clientHandlers.get(playerNumber).removePlayer();
+				try {
+					clientSockets.get(playerNumber).close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			} else if (PCE.getPropertyName() == "Removed Player") { // Problem occured, player removed
 				int playerNumber = (Integer) PCE.getNewValue();
 				gui.removePlayer(playerNumber);
+				try {
+					clientSockets.get(playerNumber).close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			} else if (PCE.getPropertyName() == "New Player") {
 				int playerNumber = (Integer) PCE.getNewValue();
 				gui.addRowToPlayers(playerNumber);
@@ -112,8 +122,13 @@ public class Server {
 	}
 
 	public static void main(String[] args) {
-		Server server = new Server();
-		server.run();
+		ArrayList<GameInfo> gameInfo = ReadConfig.readFile();
+		if (gameInfo == null) {
+			JOptionPane.showMessageDialog(null, "Problem reading config file");
+		} else {
+			Server server = new Server(gameInfo);
+			server.run();
+		}
 	}
 
 }
