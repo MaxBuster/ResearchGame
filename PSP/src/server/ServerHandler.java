@@ -66,6 +66,7 @@ public class ServerHandler {
 		writeInt(player.getParty());
 		writeInt(player.getIdealPt());
 		writeInt(model.getBudget());
+		writeInt(model.getNumGames());
 
 		writeChartData();
 		ArrayList<Candidate> candidates = model.getCandidates();

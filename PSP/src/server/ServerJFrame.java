@@ -33,6 +33,7 @@ public class ServerJFrame extends JFrame {
 	private JLabel roundLabel;
 	private JLabel gameLabel;
 	private JButton startGame;
+	private JButton writeData;
 	private JTable table;
 	private JScrollPane scrollPane;
 	private String[] columnNames = new String[]{"Player #", "Remove"};
@@ -63,6 +64,14 @@ public class ServerJFrame extends JFrame {
 			}
 		});
 		contentPane.add(startGame, "cell 3 2");
+
+		writeData = new JButton("Write Data");
+		writeData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				PCS.firePropertyChange("Write Data Now", null, null);
+			}
+		});
+		contentPane.add(writeData, "cell 4 2");
 
 		addScrollPane();
 	}

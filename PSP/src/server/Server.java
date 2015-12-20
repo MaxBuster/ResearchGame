@@ -117,6 +117,8 @@ public class Server {
 				gui.setGame(gameNum+1);
 			}  else if (PCE.getPropertyName() == "Game Over") {
 				gui.allowClose();
+			} else if (PCE.getPropertyName() == "Write Data Now") {
+				model.writeDataPrematurely();
 			}
 		}
 	}

@@ -45,9 +45,12 @@ public class ClientJFrame extends JFrame {
 	private JPanel contentPane;
 	private char party = 'X';
 	private int budget = 4;
+	private int currentGame = 1;
+	private int numGames;
 	private JLabel lblPlayerNumber;
 	private JLabel lblParty;
 	private JLabel lblIdealPoint;
+	private JLabel lblGameNum;
 	private JLabel lblBudget;
 	private int winnings = 0;
 	private JLabel lblWinnings;
@@ -97,6 +100,9 @@ public class ClientJFrame extends JFrame {
 		lblBudget = new JLabel("Budget");
 		lblBudget.setVisible(false);
 		contentPane.add(lblBudget, "cell 4 1");
+		lblGameNum = new JLabel("Game");
+		lblGameNum.setVisible(false);
+		contentPane.add(lblGameNum, "cell 3 0");
 		lblWinnings = new JLabel("Winnings");
 		lblWinnings.setVisible(false);
 		contentPane.add(lblWinnings, "cell 5 1");
@@ -107,7 +113,7 @@ public class ClientJFrame extends JFrame {
 		contentPane.add(pane, "cell 1 5 5 1,grow");
 	}
 
-	public void addLabels(int playerNum, char party, int idealPt, int budget) {
+	public void addLabels(int playerNum, char party, int idealPt, int budget, int numGames) {
 		lblPlayerNumber.setText("Player Number: " + playerNum);
 		lblPlayerNumber.setVisible(true);
 
@@ -121,6 +127,11 @@ public class ClientJFrame extends JFrame {
 		lblBudget.setText("Budget: " + budget);
 		lblBudget.setVisible(true);
 		this.budget = budget;
+		
+		lblGameNum.setText("Game: " + currentGame + "/" + numGames);
+		lblGameNum.setVisible(true);
+		this.numGames = numGames;
+		currentGame++;
 
 		lblWinnings.setText("Winnings: " + winnings);
 		lblWinnings.setVisible(true);

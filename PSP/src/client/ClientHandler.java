@@ -31,7 +31,8 @@ public class ClientHandler {
 	private int idealPt;
 	private char party;
 	private int budget;
-
+	private int numGames;
+	
 	public ClientHandler(DataInputStream socketInputStream, DataOutputStream socketOutputStream) {
 		PCS.addPropertyChangeListener(new ChangeListener());
 		this.socketInputStream = socketInputStream;
@@ -73,7 +74,8 @@ public class ClientHandler {
 		party = (char) readInt();
 		idealPt = readInt();
 		budget = readInt();
-		gui.addLabels(playerNum, party, idealPt, budget);
+		numGames = readInt();
+		gui.addLabels(playerNum, party, idealPt, budget, numGames);
 	}
 
 	private void getAndSetChart() {

@@ -192,4 +192,8 @@ public class Model {
 		}
 		PCS.firePropertyChange("Game Over", null, null);
 	}
+	
+	public synchronized void writeDataPrematurely() {
+		WriteDataOut.writeData(gameInfo);
+	}
 }
